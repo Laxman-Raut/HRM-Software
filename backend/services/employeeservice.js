@@ -42,6 +42,8 @@ export const createEmployeeService = async (employeeData) => {
   // Hash Password
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  const employeeRole = department === "HR" ? "HR" : "Employee";
+
   // Create Employee
   const employee = await Employee.create({
     employeeId,
@@ -57,6 +59,7 @@ export const createEmployeeService = async (employeeData) => {
     employmentStatus: employmentStatus || "Active",
     salary,
     profilePhoto: profilePhoto || "",
+    role: employeeRole
   });
 
   return employee;

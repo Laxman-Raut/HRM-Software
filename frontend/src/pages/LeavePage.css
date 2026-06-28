@@ -1,0 +1,145 @@
+/* Leave Page Styles - Tech-Slate Theme */
+
+.leave-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Leave Stats Grid */
+.leave-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.leave-stat-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-left: 3px solid var(--border-color);
+}
+
+.leave-stat-card.pending {
+  border-left-color: var(--warning);
+}
+
+.leave-stat-card.approved {
+  border-left-color: var(--success);
+}
+
+.leave-stat-card.rejected {
+  border-left-color: var(--danger);
+}
+
+.leave-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.leave-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+}
+
+/* Status Badges */
+.badge-pending {
+  background-color: var(--warning-light);
+  color: var(--warning);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: 0.725rem;
+  font-weight: 600;
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.badge-approved {
+  background-color: var(--success-light);
+  color: var(--success);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: 0.725rem;
+  font-weight: 600;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.badge-rejected {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: 0.725rem;
+  font-weight: 600;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+/* Remark styling */
+.remark-text {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+/* Approve/Reject Action Dialog */
+.approval-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 260px;
+}
+
+.approval-actions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.approval-actions .btn {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-approve {
+  background-color: var(--success);
+  color: white;
+}
+
+.btn-approve:hover {
+  background-color: #059669;
+}
+
+.btn-reject {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-reject:hover {
+  background-color: #dc2626;
+}
+
+.approval-remark-input {
+  width: 100%;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.approval-remark-input:focus {
+  border-color: var(--border-focus);
+}

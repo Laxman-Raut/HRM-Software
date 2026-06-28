@@ -4,8 +4,12 @@ import Sidebar from "./components/Layout/Sidebar";
 import Navbar from "./components/Layout/Navbar";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
+import EmployeeDashboardPage from "./pages/EmployeeDashboardPage";
 import EmployeeDirectoryPage from "./pages/EmployeeDirectoryPage";
 import EmployeeDetailPage from "./pages/EmployeeDetailPage";
+import AttendancePage from "./pages/AttendancePage";
+import WarningPage from "./pages/WarningPage";
+import LeavePage from "./pages/LeavePage";
 import EmployeeFormModal from "./components/Employee/EmployeeFormModal";
 import Toast from "./components/Common/Toast";
 import { Loader2, ServerCrash } from "lucide-react";
@@ -94,13 +98,23 @@ export default function App() {
 
   // Create employee
   const handleCreateEmployee = async (employeeData) => {
+    const formData = new FormData();
+    Object.keys(employeeData).forEach((key) => {
+      if (key === "profilePhotoFile") {
+        if (employeeData[key]) {
+          formData.append("profilePhoto", employeeData[key]);
+        }
+      } else if (key !== "profilePhoto") {
+        formData.append(key, employeeData[key]);
+      }
+    });
+
     const response = await fetch(API_BASE_URL, {
       method: "POST",
       headers: { 
-        "Content-Type": "application/json",
         "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
-      body: JSON.stringify(employeeData),
+      body: formData,
     });
 
     const resData = await response.json();
@@ -117,13 +131,24 @@ export default function App() {
     const id = getEmployeeDbId(employeeData);
     // Strip Mongoose metadata, password, and immutable fields to prevent db validation errors
     const { _id, id: resolvedId, createdAt, updatedAt, __v, password, ...updateBody } = employeeData;
+    
+    const formData = new FormData();
+    Object.keys(updateBody).forEach((key) => {
+      if (key === "profilePhotoFile") {
+        if (updateBody[key]) {
+          formData.append("profilePhoto", updateBody[key]);
+        }
+      } else if (key !== "profilePhoto") {
+        formData.append(key, updateBody[key]);
+      }
+    });
+
     const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: "PUT",
       headers: { 
-        "Content-Type": "application/json",
         "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
-      body: JSON.stringify(updateBody),
+      body: formData,
     });
 
     const resData = await response.json();
@@ -239,11 +264,18 @@ export default function App() {
             <Route
               path="/dashboard"
               element={
-                <DashboardPage
-                  employees={employees}
-                  showAddModal={showAddModal}
-                  user={user}
-                />
+                user && user.role === "Employee" ? (
+                  <EmployeeDashboardPage
+                    employees={employees}
+                    user={user}
+                  />
+                ) : (
+                  <DashboardPage
+                    employees={employees}
+                    showAddModal={showAddModal}
+                    user={user}
+                  />
+                )
               }
             />
             <Route
@@ -266,6 +298,33 @@ export default function App() {
                   onEdit={showEditModal}
                   onDelete={handleDeleteEmployee}
                   user={user}
+                />
+              }
+            />
+            <Route
+              path="/attendance"
+              element={
+                <AttendancePage
+                  user={user}
+                  employees={employees}
+                />
+              }
+            />
+            <Route
+              path="/warnings"
+              element={
+                <WarningPage
+                  user={user}
+                  employees={employees}
+                />
+              }
+            />
+            <Route
+              path="/leaves"
+              element={
+                <LeavePage
+                  user={user}
+                  employees={employees}
                 />
               }
             />

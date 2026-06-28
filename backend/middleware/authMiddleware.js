@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Admin from "../models/Admin.js";
+import Employee from "../models/Employee.js";
 
 export const protect = async (req, res, next) => {
   let token;
@@ -15,8 +16,19 @@ export const protect = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
 
-      // Get admin from DB
-      req.admin = await Admin.findById(decoded.id).select("-password");
+      // Get user from DB (Admin or Employee)
+      let user = await Admin.findById(decoded.id).select("-password");
+      if (!user) {
+        user = await Employee.findById(decoded.id).select("-password");
+      }
+
+      if (user) {
+        // Explicitly set the role on req.user from token payload or fallback
+        user.role = decoded.role || (user.email && user.email.endsWith("admin@gmail.com") ? "Admin" : "Employee");
+      }
+
+      req.user = user;
+      req.admin = user && decoded.role !== "Employee" ? user : null;
 
       next();
     } catch (error) {

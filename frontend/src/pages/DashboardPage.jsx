@@ -1,6 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, UserCheck, DollarSign, UserPlus, Briefcase, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
+import MetricsGrid from "../components/Dashboard/MetricsGrid";
+import DepartmentDistribution from "../components/Dashboard/DepartmentDistribution";
+import RecentActivity from "../components/Dashboard/RecentActivity";
 
 export default function DashboardPage({ employees, showAddModal, user }) {
   const navigate = useNavigate();
@@ -59,7 +62,7 @@ export default function DashboardPage({ employees, showAddModal, user }) {
           day: "numeric",
           year: "numeric"
         }) : "Recently",
-        color: "#6366f1",
+        color: "#2563eb",
       });
     });
 
@@ -75,7 +78,7 @@ export default function DashboardPage({ employees, showAddModal, user }) {
           id: "act-2",
           desc: "HR portal integration with backend completed.",
           time: "1 hour ago",
-          color: "#0ea5e9",
+          color: "#3b82f6",
         },
       ];
     }
@@ -95,7 +98,7 @@ export default function DashboardPage({ employees, showAddModal, user }) {
 
   return (
     <div className="fade-in">
-      {/* Date Subtitle (Navbar now holds page title) */}
+      {/* Date Subtitle */}
       <div style={{ marginBottom: "1.5rem" }}>
         <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <Calendar size={14} />
@@ -103,129 +106,29 @@ export default function DashboardPage({ employees, showAddModal, user }) {
         </p>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="metrics-grid">
-        <div className="metric-card glass-card">
-          <div className="metric-details">
-            <span className="metric-label">Total Employees</span>
-            <span className="metric-value">{totalEmployees}</span>
-          </div>
-          <div className="metric-icon-wrapper primary">
-            <Users size={22} />
-          </div>
-        </div>
-
-        <div className="metric-card glass-card">
-          <div className="metric-details">
-            <span className="metric-label">Active Employees</span>
-            <span className="metric-value">{activeEmployees}</span>
-          </div>
-          <div className="metric-icon-wrapper success">
-            <UserCheck size={22} />
-          </div>
-        </div>
-
-        {user && user.role !== "Employee" && (
-          <div className="metric-card glass-card">
-            <div className="metric-details">
-              <span className="metric-label">Average Salary</span>
-              <span className="metric-value">{formatCurrency(avgSalary)}</span>
-            </div>
-            <div className="metric-icon-wrapper warning">
-              <DollarSign size={22} />
-            </div>
-          </div>
-        )}
-
-        <div className="metric-card glass-card">
-          <div className="metric-details">
-            <span className="metric-label">Interns Count</span>
-            <span className="metric-value">{internsCount}</span>
-          </div>
-          <div className="metric-icon-wrapper info">
-            <Briefcase size={22} />
-          </div>
-        </div>
-      </div>
+      {/* Metrics Grid Sub-Component */}
+      <MetricsGrid
+        totalEmployees={totalEmployees}
+        activeEmployees={activeEmployees}
+        avgSalary={avgSalary}
+        internsCount={internsCount}
+        formatCurrency={formatCurrency}
+        user={user}
+      />
 
       {/* Analytics Details Grid */}
       <div className="charts-grid">
-        {/* Department Distribution Chart */}
-        <div className="dashboard-card glass-card">
-          <div className="card-header">
-            <div>
-              <h2 className="card-title">Department Distribution</h2>
-              <span className="metric-label" style={{ textTransform: "none", fontSize: "0.75rem", fontWeight: "500", marginTop: "0.15rem", display: "inline-block" }}>
-                Staff count breakdown by active departments
-              </span>
-            </div>
-          </div>
-          <div className="card-body">
-            {deptData.length > 0 ? (
-              <div className="chart-container">
-                {deptData.map((d) => {
-                  const percent = (d.count / maxDeptCount) * 100;
-                  return (
-                    <div key={d.name} className="chart-bar-wrapper">
-                      <div
-                        className="chart-bar"
-                        style={{ height: `${Math.max(percent, 8)}%` }}
-                      >
-                        <div className="chart-bar-tooltip">
-                          {d.count} {d.count === 1 ? "Employee" : "Employees"}
-                        </div>
-                      </div>
-                      <span className="chart-label" title={d.name}>
-                        {d.name}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="chart-empty">
-                <Users size={40} className="empty-state-icon" />
-                <span className="empty-state-title">No Department Data</span>
-                <span className="metric-label" style={{ textTransform: "none" }}>Create employees to view statistics.</span>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Department Distribution Chart Sub-Component */}
+        <DepartmentDistribution
+          deptData={deptData}
+          maxDeptCount={maxDeptCount}
+        />
 
-        {/* Recent Activity */}
-        <div className="dashboard-card glass-card">
-          <div className="card-header">
-            <div>
-              <h2 className="card-title">Recent Activity</h2>
-              <span className="metric-label" style={{ textTransform: "none", fontSize: "0.75rem", fontWeight: "500", marginTop: "0.15rem", display: "inline-block" }}>
-                Timeline of recent portal actions
-              </span>
-            </div>
-            <button
-              className="btn btn-secondary"
-              style={{ padding: "0.3rem 0.6rem", fontSize: "0.725rem", minHeight: "auto" }}
-              onClick={() => navigate("/employees")}
-            >
-              View All
-            </button>
-          </div>
-          <div className="card-body" style={{ alignItems: "flex-start", justifyContent: "flex-start" }}>
-            <div className="activity-list">
-              {activities.map((act) => (
-                <div key={act.id} className="activity-item">
-                  <div
-                    className="activity-dot"
-                    style={{ color: act.color || "#6366f1", backgroundColor: act.color || "#6366f1" }}
-                  />
-                  <div className="activity-details">
-                    <span className="activity-desc">{act.desc}</span>
-                    <span className="activity-time">{act.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Recent Activity Sub-Component */}
+        <RecentActivity
+          activities={activities}
+          navigate={navigate}
+        />
       </div>
     </div>
   );

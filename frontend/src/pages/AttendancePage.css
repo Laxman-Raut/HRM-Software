@@ -1,0 +1,288 @@
+/* Attendance Page Styles - Clean SaaS Tech-Slate Theme */
+
+.attendance-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Digital Clock Widget */
+.clock-widget {
+  text-align: center;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.digital-clock {
+  font-family: var(--font-sans);
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.clock-date {
+  font-size: 0.925rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.clock-actions {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 440px;
+  justify-content: center;
+}
+
+.btn-clock {
+  flex: 1;
+  padding: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-clock svg {
+  transition: transform 0.2s;
+}
+
+.btn-clock:hover:not(:disabled) svg {
+  transform: translateY(-1px);
+}
+
+.btn-clock-in {
+  background: var(--success);
+  color: #ffffff;
+}
+
+.btn-clock-in:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-clock-out {
+  background: var(--warning);
+  color: #ffffff;
+}
+
+.btn-clock-out:hover:not(:disabled) {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+.btn-clock:disabled {
+  background: var(--bg-primary);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.status-badge-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+}
+
+.status-badge-inline.checked-in {
+  background-color: var(--success-light);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.status-badge-inline.checked-out {
+  background-color: var(--info-light);
+  color: var(--info);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.status-badge-inline.not-checked-in {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+/* History Logs */
+.attendance-history-card {
+  padding: 1.5rem;
+}
+
+.attendance-table-wrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.attendance-table th {
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.attendance-table td {
+  color: var(--text-primary);
+}
+
+.badge-present {
+  background-color: var(--success-light);
+  color: var(--success);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: 0.725rem;
+  font-weight: 600;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.badge-absent {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: 0.725rem;
+  font-weight: 600;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+.badge-half-day {
+  background-color: var(--warning-light);
+  color: var(--warning);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: 0.725rem;
+  font-weight: 600;
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+/* Filters for Admin Mode */
+.filters-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-input-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filters-row-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.employee-info-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.employee-avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background-color: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border: 1px solid var(--border-color);
+}
+
+.employee-meta-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.employee-meta-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.employee-meta-dept {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Statistics row */
+.stats-grid-attendance {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.stat-attendance-item {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-attendance-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.stat-attendance-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+}
+
+/* Manual Attendance Modal Fields */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

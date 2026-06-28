@@ -1,10 +1,14 @@
 import Employee from "../models/Employee.js";
 import { createEmployeeService } from "../services/employeeService.js";
-
 // Create Employee
 export const createEmployee = async (req, res) => {
   try {
-    const employee = await createEmployeeService(req.body);
+    const employeeData = {
+      ...req.body,
+      profilePhoto: req.file ? req.file.path : "",
+    };
+
+    const employee = await createEmployeeService(employeeData);
 
     res.status(201).json({
       success: true,
@@ -18,7 +22,6 @@ export const createEmployee = async (req, res) => {
     });
   }
 };
-
 // Get All Employees
 export const getAllEmployees = async (req, res) => {
   try {
@@ -64,9 +67,16 @@ export const getEmployeeById = async (req, res) => {
 // Update Employee
 export const updateEmployee = async (req, res) => {
   try {
+    const updateData = { ...req.body };
+    if (req.file) {
+      updateData.profilePhoto = req.file.path;
+    }
+    if (updateData.department) {
+      updateData.role = updateData.department === "HR" ? "HR" : "Employee";
+    }
     const employee = await Employee.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       {
         new: true,
         runValidators: true,

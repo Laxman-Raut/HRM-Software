@@ -20,7 +20,9 @@ export const login = async (req, res) => {
       user = await Employee.findOne({ email });
 
       if (user) {
-        role = "Employee";
+        const isHrDept = user.department === "HR";
+        const isHrDesignation = user.designation && /hr|human resource|admin/i.test(user.designation);
+        role = (isHrDept || isHrDesignation) ? "HR" : (user.role || "Employee");
       }
     }
 
@@ -63,6 +65,10 @@ export const login = async (req, res) => {
         id: user._id,
         email: user.email,
         role,
+        employeeId: user.employeeId || null,
+        firstName: user.firstName || null,
+        lastName: user.lastName || null,
+        name: user.firstName ? `${user.firstName} ${user.lastName}` : (user.name || "Admin"),
       },
     });
   } catch (error) {

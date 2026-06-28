@@ -8,7 +8,7 @@ export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen,
   const getPageTitle = () => {
     const path = location.pathname;
     if (path.includes("/dashboard")) {
-      return "Dashboard Overview";
+      return user && user.role === "Employee" ? "My Dashboard" : "Dashboard Overview";
     }
     if (path.match(/\/employees\/[a-zA-Z0-9_-]+/)) {
       return "Employee Profile Details";

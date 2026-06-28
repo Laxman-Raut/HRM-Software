@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Save, AlertCircle } from "lucide-react";
+import EmployeeFormFields from "./EmployeeFormFields";
 
 export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee }) {
   const isEdit = !!employee;
@@ -21,12 +22,16 @@ export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee 
 
   const [formData, setFormData] = useState(initialForm);
   const [errors, setErrors] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setAvatarError(false);
+      setSelectedImage(null);
+      setPreviewImage("");
       if (employee) {
         // Pre-fill form when editing
         let formattedDate = "";
@@ -66,7 +71,33 @@ export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee 
       setAvatarError(false);
     }
   };
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
 
+  if (!file) return;
+
+  // Maximum 2MB
+  if (file.size > 2 * 1024 * 1024) {
+    alert("Image size should not exceed 2 MB.");
+    return;
+  }
+
+  // Allowed image types
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    alert("Only JPG, JPEG, PNG and WEBP images are allowed.");
+    return;
+  }
+
+  setSelectedImage(file);
+  setPreviewImage(URL.createObjectURL(file));
+};
   const validate = () => {
     const newErrors = {};
 
@@ -115,6 +146,7 @@ export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee 
     try {
       const payload = {
         ...formData,
+        profilePhotoFile: selectedImage,
         salary: formData.salary === "" ? 0 : Number(formData.salary),
       };
       await onSubmit(payload);
@@ -157,9 +189,9 @@ export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee 
 
             {/* Live Profile Photo Preview Banner */}
             <div className="photo-picker-container" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", padding: "1.25rem", border: "1.5px dashed var(--border-color)", borderRadius: "var(--radius-lg)", marginBottom: "1.5rem", backgroundColor: "rgba(255, 255, 255, 0.01)" }}>
-              {formData.profilePhoto && !avatarError ? (
+              {(previewImage || formData.profilePhoto) && !avatarError ? (
                 <img
-                  src={formData.profilePhoto}
+                  src={previewImage || formData.profilePhoto}
                   alt="Preview"
                   className="preview-photo"
                   style={{ width: "4.5rem", height: "4.5rem", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--border-color)" }}
@@ -173,209 +205,29 @@ export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee 
                   {getInitialsPreview()}
                 </div>
               )}
-              <span className="form-label" style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>
-                Live Photo Preview
-              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: "none" }}
+                id="file-upload-input"
+              />
+              <label
+                htmlFor="file-upload-input"
+                className="btn btn-secondary"
+                style={{ padding: "0.4rem 0.85rem", fontSize: "0.75rem", minHeight: "auto", cursor: "pointer", marginTop: "0.5rem" }}
+              >
+                Upload Photo
+              </label>
             </div>
 
-            <div className="form-grid">
-              {/* Employee ID */}
-              <div className="form-group">
-                <label className="form-label">Employee ID *</label>
-                <input
-                  type="text"
-                  name="employeeId"
-                  value={formData.employeeId}
-                  onChange={handleChange}
-                  placeholder="e.g. EMP-101"
-                  className="form-control"
-                  disabled={isEdit}
-                />
-                {errors.employeeId && <span className="form-error">{errors.employeeId}</span>}
-              </div>
-
-              {/* Profile Photo URL */}
-              <div className="form-group">
-                <label className="form-label">Profile Photo URL</label>
-                <input
-                  type="url"
-                  name="profilePhoto"
-                  value={formData.profilePhoto}
-                  onChange={handleChange}
-                  placeholder="https://example.com/avatar.jpg"
-                  className="form-control"
-                />
-                {errors.profilePhoto && <span className="form-error">{errors.profilePhoto}</span>}
-              </div>
-
-              {/* First Name */}
-              <div className="form-group">
-                <label className="form-label">First Name *</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="John"
-                  className="form-control"
-                />
-                {errors.firstName && <span className="form-error">{errors.firstName}</span>}
-              </div>
-
-              {/* Last Name */}
-              <div className="form-group">
-                <label className="form-label">Last Name *</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Doe"
-                  className="form-control"
-                />
-                {errors.lastName && <span className="form-error">{errors.lastName}</span>}
-              </div>
-
-              {/* Email */}
-              <div className="form-group">
-                <label className="form-label">Email *</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="john.doe@company.com"
-                  className="form-control"
-                />
-                {errors.email && <span className="form-error">{errors.email}</span>}
-              </div>
-
-              {/* Password */}
-              {!isEdit && (
-                <div className="form-group">
-                  <label className="form-label">Password *</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    className="form-control"
-                  />
-                  {errors.password && <span className="form-error">{errors.password}</span>}
-                </div>
-              )}
-
-              {/* Phone */}
-              <div className="form-group">
-                <label className="form-label">Phone Number *</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+1 (555) 019-2834"
-                  className="form-control"
-                />
-                {errors.phone && <span className="form-error">{errors.phone}</span>}
-              </div>
-
-              {/* Department */}
-              <div className="form-group">
-                <label className="form-label">Department *</label>
-                <select
-                  name="department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  className="form-control"
-                  style={{ cursor: "pointer" }}
-                >
-                  <option value="">Select Department</option>
-                  <option value="HR">HR</option>
-                  <option value="IT">IT</option>
-                  <option value="Sales">Sales</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Accounts">Accounts</option>
-                  <option value="Operations">Operations</option>
-                </select>
-                {errors.department && <span className="form-error">{errors.department}</span>}
-              </div>
-
-              {/* Designation */}
-              <div className="form-group">
-                <label className="form-label">Designation *</label>
-                <input
-                  type="text"
-                  name="designation"
-                  value={formData.designation}
-                  onChange={handleChange}
-                  placeholder="Senior Software Engineer"
-                  className="form-control"
-                />
-                {errors.designation && <span className="form-error">{errors.designation}</span>}
-              </div>
-
-              {/* Joining Date */}
-              <div className="form-group">
-                <label className="form-label">Joining Date *</label>
-                <input
-                  type="date"
-                  name="joiningDate"
-                  value={formData.joiningDate}
-                  onChange={handleChange}
-                  className="form-control"
-                />
-                {errors.joiningDate && <span className="form-error">{errors.joiningDate}</span>}
-              </div>
-
-              {/* Salary */}
-              <div className="form-group">
-                <label className="form-label">Salary (USD/year)</label>
-                <input
-                  type="number"
-                  name="salary"
-                  value={formData.salary}
-                  onChange={handleChange}
-                  placeholder="95000"
-                  className="form-control"
-                  min="0"
-                />
-                {errors.salary && <span className="form-error">{errors.salary}</span>}
-              </div>
-
-              {/* Employment Type */}
-              <div className="form-group">
-                <label className="form-label">Employment Type</label>
-                <select
-                  name="employmentType"
-                  value={formData.employmentType}
-                  onChange={handleChange}
-                  className="form-control"
-                  style={{ cursor: "pointer" }}
-                >
-                  <option value="Full-Time">Full-Time</option>
-                  <option value="Part-Time">Part-Time</option>
-                  <option value="Intern">Intern</option>
-                  <option value="Contract">Contract</option>
-                </select>
-              </div>
-
-              {/* Employment Status */}
-              <div className="form-group">
-                <label className="form-label">Status</label>
-                <select
-                  name="employmentStatus"
-                  value={formData.employmentStatus}
-                  onChange={handleChange}
-                  className="form-control"
-                  style={{ cursor: "pointer" }}
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-              </div>
-            </div>
+            {/* Decomposed Form Fields Sub-Component */}
+            <EmployeeFormFields
+              formData={formData}
+              handleChange={handleChange}
+              errors={errors}
+              isEdit={isEdit}
+            />
           </div>
 
           <div className="modal-footer">

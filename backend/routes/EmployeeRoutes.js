@@ -8,14 +8,33 @@ import {
 } from "../controllers/employeeController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
-// Protected routes (ONLY LOGGED-IN ADMIN)
-router.post("/", protect, createEmployee);
+// Create Employee (with profile photo upload)
+router.post(
+  "/",
+  protect,
+  upload.single("profilePhoto"),
+  createEmployee
+);
+
+// Get All Employees
 router.get("/", protect, getAllEmployees);
+
+// Get Employee By ID
 router.get("/:id", protect, getEmployeeById);
-router.put("/:id", protect, updateEmployee);
+
+// Update Employee (with optional profile photo upload)
+router.put(
+  "/:id",
+  protect,
+  upload.single("profilePhoto"),
+  updateEmployee
+);
+
+// Delete Employee
 router.delete("/:id", protect, deleteEmployee);
 
 export default router;
