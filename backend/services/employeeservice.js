@@ -39,8 +39,14 @@ export const createEmployeeService = async (employeeData) => {
     throw new Error("Phone number already exists");
   }
 
-  // Hash Password
+  // Hash Password — guard against empty/undefined password (bcrypt throws "Illegal arguments" otherwise)
+  if (!password || typeof password !== "string" || password.trim() === "") {
+    throw new Error("Password is required and cannot be empty");
+  }
   const hashedPassword = await bcrypt.hash(password, 10);
+
+  // salary comes as a string from multipart FormData — convert to number explicitly
+  const parsedSalary = salary !== undefined && salary !== "" ? parseFloat(salary) : 0;
 
   const employeeRole = department === "HR" ? "HR" : "Employee";
 
@@ -57,7 +63,7 @@ export const createEmployeeService = async (employeeData) => {
     joiningDate,
     employmentType,
     employmentStatus: employmentStatus || "Active",
-    salary,
+    salary: parsedSalary,
     profilePhoto: profilePhoto || "",
     role: employeeRole
   });

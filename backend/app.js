@@ -5,7 +5,9 @@ import AuthRoutes from "./routes/authRoutes.js";
 import attendanceRoutes from "./routes/attendanceRoutes.js";
 import warningRoutes from "./routes/WarningRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js";
-const app = express(); 
+import holidayRoutes from "./routes/holidayRoutes.js";
+
+const app = express();
 
 // Middleware
 app.use(cors());
@@ -26,6 +28,8 @@ app.use("/api/employees", EmployeeRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/warnings", warningRoutes);
 app.use("/api/leaves", leaveRoutes);
+app.use("/api/holidays", holidayRoutes);
+
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error("Express Error Handler:", err);

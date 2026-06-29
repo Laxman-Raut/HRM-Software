@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, ChevronLeft, ChevronRight, User, CalendarCheck, AlertOctagon, CalendarRange } from "lucide-react";
+import { LayoutDashboard, Users, ChevronLeft, ChevronRight, User, CalendarCheck, AlertOctagon, CalendarRange, CalendarDays } from "lucide-react";
 
 export default function Sidebar({
   collapsed,
@@ -37,15 +37,17 @@ export default function Sidebar({
           <span className="nav-text">Dashboard</span>
         </NavLink>
 
-        <NavLink
-          to="/employees"
-          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
-          end
-          onClick={() => setMobileOpen && setMobileOpen(false)}
-        >
-          <Users size={20} />
-          <span className="nav-text">Employees</span>
-        </NavLink>
+        {user && user.role !== "Employee" && (
+          <NavLink
+            to="/employees"
+            className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+            end
+            onClick={() => setMobileOpen && setMobileOpen(false)}
+          >
+            <Users size={20} />
+            <span className="nav-text">Employees</span>
+          </NavLink>
+        )}
 
         <NavLink
           to="/attendance"
@@ -72,6 +74,15 @@ export default function Sidebar({
         >
           <CalendarRange size={20} />
           <span className="nav-text">Leaves</span>
+        </NavLink>
+
+        <NavLink
+          to="/holidays"
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+          onClick={() => setMobileOpen && setMobileOpen(false)}
+        >
+          <CalendarDays size={20} />
+          <span className="nav-text">Holidays</span>
         </NavLink>
       </nav>
 

@@ -4,9 +4,18 @@ import Leave from "../models/Leave.js";
 // Apply Leave
 export const applyLeave = async (req, res) => {
   try {
+    // Only employees (and HR employees) can apply for leave
+    // Admin users are in a different collection and cannot apply leave via this endpoint
+    if (req.user.role === "Admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin accounts cannot apply for leave. Please use an Employee account.",
+      });
+    }
+
     const leaveData = {
       ...req.body,
-      employee: req.user._id, // Set the employee reference from req.user
+      employee: req.user._id, // Set the employee reference from req.user (Employee _id)
     };
 
     const leave = await createLeaveService(leaveData);

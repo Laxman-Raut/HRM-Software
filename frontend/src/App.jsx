@@ -10,6 +10,7 @@ import EmployeeDetailPage from "./pages/EmployeeDetailPage";
 import AttendancePage from "./pages/AttendancePage";
 import WarningPage from "./pages/WarningPage";
 import LeavePage from "./pages/LeavePage";
+import HolidayPage from "./pages/HolidayPage";
 import EmployeeFormModal from "./components/Employee/EmployeeFormModal";
 import Toast from "./components/Common/Toast";
 import { Loader2, ServerCrash } from "lucide-react";
@@ -51,9 +52,20 @@ export default function App() {
     setToasts((prev) => [...prev, { id, message, type }]);
   };
 
-  // Fetch all employees
+  // Fetch all employees (Admin/HR only — Employees are redirected to their own dashboard)
   const fetchEmployees = async () => {
     if (!isAuthenticated) return;
+
+    // Employee role users cannot access the employees list endpoint (403)
+    // They have their own dashboard that fetches their personal data directly
+    const currentUser = (() => {
+      try { return JSON.parse(localStorage.getItem("user")); } catch { return null; }
+    })();
+    if (currentUser && currentUser.role === "Employee") {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -62,7 +74,9 @@ export default function App() {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
       });
-      if (response.status === 401 || response.status === 403) {
+      // 401 = invalid/expired token → logout
+      // 403 = forbidden (role mismatch) → don't logout, just show error
+      if (response.status === 401) {
         handleLogout();
         return;
       }
@@ -325,6 +339,14 @@ export default function App() {
                 <LeavePage
                   user={user}
                   employees={employees}
+                />
+              }
+            />
+            <Route
+              path="/holidays"
+              element={
+                <HolidayPage
+                  user={user}
                 />
               }
             />

@@ -22,13 +22,19 @@ export const protect = async (req, res, next) => {
         user = await Employee.findById(decoded.id).select("-password");
       }
 
-      if (user) {
-        // Explicitly set the role on req.user from token payload or fallback
-        user.role = decoded.role || (user.email && user.email.endsWith("admin@gmail.com") ? "Admin" : "Employee");
+      // If user was deleted from DB but token is still valid
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "User no longer exists",
+        });
       }
 
+      // Always trust the role from the JWT — prevents HR being downgraded to Employee
+      user.role = decoded.role || user.role || "Employee";
+
       req.user = user;
-      req.admin = user && decoded.role !== "Employee" ? user : null;
+      req.admin = decoded.role !== "Employee" ? user : null;
 
       next();
     } catch (error) {

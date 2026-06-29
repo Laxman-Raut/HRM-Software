@@ -16,6 +16,9 @@ export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen,
     if (path.includes("/employees")) {
       return "Employee Directory";
     }
+    if (path.includes("/holidays")) {
+      return "Holiday Calendar";
+    }
     return "HRM Portal";
   };
 

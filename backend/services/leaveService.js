@@ -1,5 +1,4 @@
 import Leave from "../models/Leave.js";
-import Employee from "../models/Employee.js";
 
 export const createLeaveService = async (leaveData) => {
   const {
@@ -10,16 +9,30 @@ export const createLeaveService = async (leaveData) => {
     reason,
   } = leaveData;
 
-  // Check Employee
-  const employeeExists = await Employee.findById(employee);
+  // Validate required fields
+  if (!employee) {
+    throw new Error("Employee reference is required");
+  }
 
-  if (!employeeExists) {
-    throw new Error("Employee not found");
+  if (!leaveType) {
+    throw new Error("Leave type is required");
+  }
+
+  if (!startDate || !endDate) {
+    throw new Error("Start date and end date are required");
+  }
+
+  if (!reason || !reason.trim()) {
+    throw new Error("Reason is required");
   }
 
   // Validate Dates
   const start = new Date(startDate);
   const end = new Date(endDate);
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new Error("Invalid date format");
+  }
 
   if (end < start) {
     throw new Error("End date cannot be before start date");

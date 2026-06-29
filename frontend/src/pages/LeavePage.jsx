@@ -177,7 +177,6 @@ export default function LeavePage({ user, employees }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleApplyLeave}
-        userId={user ? user._id : ""}
       />
     </div>
   );
