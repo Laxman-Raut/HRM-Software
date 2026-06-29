@@ -1,9 +1,113 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Sun, Moon, User, Bell, LogOut, Menu } from "lucide-react";
+import { 
+  Sun, 
+  Moon, 
+  User, 
+  Bell, 
+  LogOut, 
+  Menu, 
+  Check, 
+  Info, 
+  CheckCircle2, 
+  AlertTriangle, 
+  AlertOctagon 
+} from "lucide-react";
+
+const NOTIFICATIONS_API = "http://localhost:5000/api/notifications";
 
 export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen, user }) {
   const location = useLocation();
+  const [notifications, setNotifications] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // Fetch notifications
+  const fetchNotifications = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch(NOTIFICATIONS_API, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        if (json.success) {
+          setNotifications(json.data || []);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  };
+
+  // Poll notifications every 30 seconds
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Handle closing dropdown when clicking outside
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleClose = () => setDropdownOpen(false);
+    document.addEventListener("click", handleClose);
+    return () => document.removeEventListener("click", handleClose);
+  }, [dropdownOpen]);
+
+  // Mark single notification as read
+  const handleMarkAsRead = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    // Optimistically update locally first
+    setNotifications(prev => 
+      prev.map(n => n._id === id ? { ...n, isRead: true } : n)
+    );
+
+    try {
+      await fetch(`${NOTIFICATIONS_API}/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    } catch (err) {
+      console.error("Error marking notification as read:", err);
+    }
+  };
+
+  // Mark all notifications as read
+  const handleMarkAllAsRead = async (e) => {
+    e.stopPropagation(); // prevent dropdown closing
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const unread = notifications.filter(n => !n.isRead);
+    if (unread.length === 0) return;
+
+    // Optimistically update locally
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+      await Promise.all(
+        unread.map(n => 
+          fetch(`${NOTIFICATIONS_API}/${n._id}`, {
+            method: "PUT",
+            headers
+          })
+        )
+      );
+    } catch (err) {
+      console.error("Error marking all notifications as read:", err);
+      // rollback or refetch on error
+      fetchNotifications();
+    }
+  };
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -22,6 +126,44 @@ export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen,
     return "HRM Portal";
   };
 
+  // Helper to format date relatively
+  const formatRelativeTime = (dateStr) => {
+    if (!dateStr) return "";
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
+  // Helper to get matching type icon
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case "SUCCESS":
+        return CheckCircle2;
+      case "WARNING":
+        return AlertTriangle;
+      case "ERROR":
+        return AlertOctagon;
+      case "INFO":
+      default:
+        return Info;
+    }
+  };
+
+  const handleDropdownClick = (e) => {
+    e.stopPropagation();
+  };
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
   return (
     <header className="global-navbar glass-card">
       <div className="navbar-left">
@@ -36,10 +178,62 @@ export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen,
       </div>
 
       <div className="navbar-right">
-        {/* Notifications Icon */}
-        <button className="navbar-action-btn" title="Notifications">
-          <Bell size={18} />
-        </button>
+        {/* Notifications Icon & Dropdown Wrapper */}
+        <div className="navbar-notification-wrapper" onClick={handleDropdownClick}>
+          <button 
+            className={`navbar-action-btn ${dropdownOpen ? "active" : ""}`}
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            title="Notifications"
+          >
+            <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="notification-badge">{unreadCount}</span>
+            )}
+          </button>
+
+          {dropdownOpen && (
+            <div className="notifications-dropdown">
+              <div className="notifications-dropdown-header">
+                <h3>Notifications</h3>
+                {unreadCount > 0 && (
+                  <button className="notifications-clear-btn" onClick={handleMarkAllAsRead}>
+                    Mark all as read
+                  </button>
+                )}
+              </div>
+
+              <div className="notifications-dropdown-list">
+                {notifications.length > 0 ? (
+                  notifications.map((n) => {
+                    const Icon = getNotificationIcon(n.type);
+                    const iconClass = n.type ? n.type.toLowerCase() : "info";
+                    return (
+                      <div 
+                        key={n._id} 
+                        className={`notification-dropdown-item ${n.isRead ? "" : "unread"}`}
+                        onClick={() => handleMarkAsRead(n._id)}
+                      >
+                        <div className={`notification-item-icon-box ${iconClass}`}>
+                          <Icon size={14} />
+                        </div>
+                        <div className="notification-item-content">
+                          <span className="notification-item-title">{n.title}</span>
+                          <span className="notification-item-message">{n.message}</span>
+                          <span className="notification-item-time">{formatRelativeTime(n.createdAt)}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="notification-dropdown-empty">
+                    <Bell className="notification-dropdown-empty-icon" size={24} />
+                    <span className="notification-dropdown-empty-text">No notifications</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Theme Toggle Button */}
         <button

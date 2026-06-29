@@ -86,10 +86,19 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-
     role: {
       type: String,
       default: "Employee",
+    },
+
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+
+    resetPasswordExpire: {
+      type: Date,
+      default: null,
     },
   },
   {

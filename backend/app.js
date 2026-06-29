@@ -6,7 +6,7 @@ import attendanceRoutes from "./routes/attendanceRoutes.js";
 import warningRoutes from "./routes/WarningRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js";
 import holidayRoutes from "./routes/holidayRoutes.js";
-
+import notificationRoutes from "./routes/notificationRoutes.js";
 const app = express();
 
 // Middleware
@@ -29,7 +29,7 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/warnings", warningRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/holidays", holidayRoutes);
-
+app.use("/api/notifications", notificationRoutes);
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error("Express Error Handler:", err);

@@ -1,7 +1,10 @@
 import { createLeaveService } from "../services/leaveService.js";
 import Leave from "../models/Leave.js";
+import { createNotification } from "../services/notificationService.js";
 
-// Apply Leave
+/**
+ * APPLY LEAVE (CREATE LEAVE)
+ */
 export const applyLeave = async (req, res) => {
   try {
     // Only employees (and HR employees) can apply for leave
@@ -20,6 +23,14 @@ export const applyLeave = async (req, res) => {
 
     const leave = await createLeaveService(leaveData);
 
+    // 🔔 NOTIFY HR
+    await createNotification({
+      title: "New Leave Request",
+      message: `${req.user.firstName || req.user.name || "Employee"} applied for leave`,
+      type: "INFO",
+      forRole: "HR",
+    });
+
     res.status(201).json({
       success: true,
       message: "Leave applied successfully",
@@ -33,7 +44,9 @@ export const applyLeave = async (req, res) => {
   }
 };
 
-// Get Leaves (role-based)
+/**
+ * GET LEAVES (role-based)
+ */
 export const getLeaves = async (req, res) => {
   try {
     let query = {};
@@ -58,17 +71,12 @@ export const getLeaves = async (req, res) => {
   }
 };
 
-// Update Leave Status (Approve/Reject)
+/**
+ * UPDATE LEAVE STATUS (APPROVE / REJECT)
+ */
 export const updateLeaveStatus = async (req, res) => {
   try {
-    if (req.user.role === "Employee") {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to approve/reject leave requests",
-      });
-    }
-
-    const { status, remark } = req.body;
+    const { status, remark } = req.body; // Approved / Rejected
 
     if (!["Approved", "Rejected"].includes(status)) {
       return res.status(400).json({
@@ -77,7 +85,7 @@ export const updateLeaveStatus = async (req, res) => {
       });
     }
 
-    const leave = await Leave.findById(req.params.id);
+    const leave = await Leave.findById(req.params.id).populate("employee");
     if (!leave) {
       return res.status(404).json({
         success: false,
@@ -96,13 +104,32 @@ export const updateLeaveStatus = async (req, res) => {
     // Populate employee details for response consistency
     await leave.populate("employee", "firstName lastName employeeId department email");
 
+    // 🔔 NOTIFY EMPLOYEE
+    if (status === "Approved") {
+      await createNotification({
+        title: "Leave Approved",
+        message: "Your leave has been approved",
+        type: "SUCCESS",
+        forRole: "Employee",
+      });
+    }
+
+    if (status === "Rejected") {
+      await createNotification({
+        title: "Leave Rejected",
+        message: "Your leave has been rejected",
+        type: "WARNING",
+        forRole: "Employee",
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: `Leave request ${status.toLowerCase()} successfully`,
       data: leave,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       message: error.message,
     });

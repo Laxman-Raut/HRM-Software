@@ -12,6 +12,8 @@ import WarningPage from "./pages/WarningPage";
 import LeavePage from "./pages/LeavePage";
 import HolidayPage from "./pages/HolidayPage";
 import EmployeeFormModal from "./components/Employee/EmployeeFormModal";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Toast from "./components/Common/Toast";
 import { Loader2, ServerCrash } from "lucide-react";
 import { getEmployeeDbId } from "./utils/idResolver";
@@ -109,6 +111,16 @@ export default function App() {
       document.body.classList.add("light-theme");
     }
   }, [darkMode]);
+
+  // Log out authenticated user session if they access forgot/reset password pages
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.startsWith("/reset-password") || path === "/forgot-password") {
+      if (localStorage.getItem("token") || isAuthenticated) {
+        handleLogout();
+      }
+    }
+  }, [navigate, isAuthenticated]);
 
   // Create employee
   const handleCreateEmployee = async (employeeData) => {
@@ -249,6 +261,8 @@ export default function App() {
         {!isAuthenticated ? (
           <Routes>
             <Route path="/login" element={<LoginPage onLoginSuccess={(u) => { setIsAuthenticated(true); setUser(u); }} />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/*" element={<Navigate to="/login" replace />} />
           </Routes>
         ) : loading && employees.length === 0 ? (

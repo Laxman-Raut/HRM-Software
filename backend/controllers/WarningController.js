@@ -1,5 +1,6 @@
 import { createWarningService } from "../services/warningService.js";
 import Warning from "../models/Warning.js";
+import { createNotification } from "../services/notificationService.js";
 
 // Create Warning
 export const createWarning = async (req, res) => {
@@ -14,6 +15,18 @@ export const createWarning = async (req, res) => {
     };
 
     const warning = await createWarningService(warningData);
+
+    // 🔔 NOTIFY EMPLOYEE
+    try {
+      await createNotification({
+        title: "Warning Issued",
+        message: `A new warning has been issued: "${warning.title}"`,
+        type: "ERROR",
+        forRole: "Employee",
+      });
+    } catch (err) {
+      console.error("Error creating notification for warning:", err);
+    }
 
     res.status(201).json({
       success: true,
@@ -75,6 +88,18 @@ export const updateWarningStatus = async (req, res) => {
         success: false,
         message: "Warning not found",
       });
+    }
+
+    // 🔔 NOTIFY EMPLOYEE
+    try {
+      await createNotification({
+        title: "Warning Status Updated",
+        message: `Your warning "${warning.title}" has been marked as ${status}`,
+        type: status === "Resolved" ? "SUCCESS" : "WARNING",
+        forRole: "Employee",
+      });
+    } catch (err) {
+      console.error("Error creating notification for warning update:", err);
     }
 
     res.status(200).json({

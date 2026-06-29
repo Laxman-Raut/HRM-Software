@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Lock, Mail, Users, AlertCircle, Loader2 } from "lucide-react";
 
 export default function LoginPage({ onLoginSuccess }) {
@@ -81,7 +81,12 @@ export default function LoginPage({ onLoginSuccess }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem" }}>
+              <label className="form-label" style={{ margin: 0 }}>Password</label>
+              <Link to="/forgot-password" style={{ color: "var(--primary)", textDecoration: "none", fontSize: "0.75rem", fontWeight: "650" }}>
+                Forgot Password?
+              </Link>
+            </div>
             <div className="login-input-wrapper">
               <Lock size={16} className="login-input-icon" />
               <input
