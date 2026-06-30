@@ -39,7 +39,7 @@ app.use("/api/announcements", announcementRoutes);
 app.use("/api/resignations", resignationRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/salary-structures", salaryStructureRoutes);
-app.use("/api/payroll", payrollRoutes);next
+app.use("/api/payroll", payrollRoutes);
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error("Express Error Handler:", err);

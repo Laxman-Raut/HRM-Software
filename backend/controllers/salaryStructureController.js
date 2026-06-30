@@ -18,7 +18,56 @@ export const createSalaryStructure = async (req, res) => {
       effectiveFrom,
     } = req.body;
 
-    export const getAllSalaryStructures = async (req, res) => {
+    // Check employee exists
+    const employeeExists = await Employee.findById(employee);
+
+    if (!employeeExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found.",
+      });
+    }
+
+    // Only one salary structure per employee
+    const existingSalary = await SalaryStructure.findOne({ employee });
+
+    if (existingSalary) {
+      return res.status(400).json({
+        success: false,
+        message: "Salary structure already exists for this employee.",
+      });
+    }
+
+    const salary = await SalaryStructure.create({
+      employee,
+      basicSalary,
+      hra,
+      da,
+      medicalAllowance,
+      travelAllowance,
+      specialAllowance,
+      pf,
+      esi,
+      professionalTax,
+      incomeTax,
+      effectiveFrom,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Salary structure created successfully.",
+      data: salary,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getAllSalaryStructures = async (req, res) => {
   try {
     const salaries = await SalaryStructure.find()
       .populate(
@@ -96,7 +145,6 @@ export const updateSalaryStructure = async (req, res) => {
   }
 };
 
-
 export const deleteSalaryStructure = async (req, res) => {
   try {
     const salary = await SalaryStructure.findById(req.params.id);
@@ -114,55 +162,6 @@ export const deleteSalaryStructure = async (req, res) => {
       success: true,
       message: "Salary structure deleted successfully.",
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-    // Check employee exists
-    const employeeExists = await Employee.findById(employee);
-
-    if (!employeeExists) {
-      return res.status(404).json({
-        success: false,
-        message: "Employee not found.",
-      });
-    }
-
-    // Only one salary structure per employee
-    const existingSalary = await SalaryStructure.findOne({ employee });
-
-    if (existingSalary) {
-      return res.status(400).json({
-        success: false,
-        message: "Salary structure already exists for this employee.",
-      });
-    }
-
-    const salary = await SalaryStructure.create({
-      employee,
-      basicSalary,
-      hra,
-      da,
-      medicalAllowance,
-      travelAllowance,
-      specialAllowance,
-      pf,
-      esi,
-      professionalTax,
-      incomeTax,
-      effectiveFrom,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Salary structure created successfully.",
-      data: salary,
-    });
-
   } catch (error) {
     res.status(500).json({
       success: false,

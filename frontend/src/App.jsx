@@ -14,6 +14,7 @@ import HolidayPage from "./pages/HolidayPage";
 import AnnouncementPage from "./pages/AnnouncementPage";
 import ResignationPage from "./pages/ResignationPage";
 import DocumentPage from "./pages/DocumentPage";
+import PayrollPage from "./pages/PayrollPage";
 import EmployeeFormModal from "./components/Employee/EmployeeFormModal";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -387,6 +388,15 @@ export default function App() {
               element={
                 <DocumentPage
                   user={user}
+                />
+              }
+            />
+            <Route
+              path="/payroll"
+              element={
+                <PayrollPage
+                  user={user}
+                  employees={employees}
                 />
               }
             />
