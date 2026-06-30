@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Lock, Mail, Users, AlertCircle, Loader2 } from "lucide-react";
 
+import { BASE_URL } from "../config";
+
 export default function LoginPage({ onLoginSuccess }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -20,7 +22,7 @@ export default function LoginPage({ onLoginSuccess }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

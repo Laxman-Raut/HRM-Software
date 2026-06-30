@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Lock, Users, AlertCircle, Loader2, CheckCircle } from "lucide-react";
 
+import { BASE_URL } from "../config";
+
 export default function ResetPasswordPage() {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/reset-password/${token}`, {
+      const response = await fetch(`${BASE_URL}/api/auth/reset-password/${token}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

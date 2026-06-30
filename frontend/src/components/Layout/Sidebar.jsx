@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, ChevronLeft, ChevronRight, User, CalendarCheck, AlertOctagon, CalendarRange, CalendarDays } from "lucide-react";
+import { LayoutDashboard, Users, ChevronLeft, ChevronRight, User, CalendarCheck, AlertOctagon, CalendarRange, CalendarDays, Megaphone, LogOut, FolderOpen } from "lucide-react";
 
 export default function Sidebar({
   collapsed,
@@ -83,6 +83,33 @@ export default function Sidebar({
         >
           <CalendarDays size={20} />
           <span className="nav-text">Holidays</span>
+        </NavLink>
+
+        <NavLink
+          to="/announcements"
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+          onClick={() => setMobileOpen && setMobileOpen(false)}
+        >
+          <Megaphone size={20} />
+          <span className="nav-text">Announcements</span>
+        </NavLink>
+
+        <NavLink
+          to="/resignations"
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+          onClick={() => setMobileOpen && setMobileOpen(false)}
+        >
+          <LogOut size={20} />
+          <span className="nav-text">Resignations</span>
+        </NavLink>
+
+        <NavLink
+          to="/documents"
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+          onClick={() => setMobileOpen && setMobileOpen(false)}
+        >
+          <FolderOpen size={20} />
+          <span className="nav-text">Documents</span>
         </NavLink>
       </nav>
 

@@ -17,7 +17,8 @@ import {
 import HolidayFormModal from "../components/Holiday/HolidayFormModal";
 import "./HolidayPage.css";
 
-const API_BASE_URL = "http://localhost:5000/api/holidays";
+import { BASE_URL } from "../config";
+const API_BASE_URL = `${BASE_URL}/api/holidays`;
 
 const TYPE_META = {
   National: { color: "#ef4444", icon: <Flag size={13} />, cls: "holiday-tag-national" },

@@ -5,7 +5,8 @@ import AdminAttendanceView from "../components/Attendance/AdminAttendanceView";
 import ManualAttendanceModal from "../components/Attendance/ManualAttendanceModal";
 import "./AttendancePage.css";
 
-const API_BASE_URL = "http://localhost:5000/api/attendance";
+import { BASE_URL } from "../config";
+const API_BASE_URL = `${BASE_URL}/api/attendance`;
 
 export default function AttendancePage({ user, employees }) {
   const isAdmin = user && user.role !== "Employee";

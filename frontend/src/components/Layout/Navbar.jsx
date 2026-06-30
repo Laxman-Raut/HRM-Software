@@ -14,7 +14,8 @@ import {
   AlertOctagon 
 } from "lucide-react";
 
-const NOTIFICATIONS_API = "http://localhost:5000/api/notifications";
+import { BASE_URL } from "../../config";
+const NOTIFICATIONS_API = `${BASE_URL}/api/notifications`;
 
 export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen, user }) {
   const location = useLocation();

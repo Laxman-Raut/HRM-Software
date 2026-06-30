@@ -13,16 +13,16 @@ import {
   X,
   Plus,
   ArrowRight,
-  ShieldAlert,
   Loader2,
   AlertTriangle
 } from "lucide-react";
 import EmployeeAvatar from "../components/Common/EmployeeAvatar";
 import "./DashboardPage.css";
 
-const LEAVES_API = "http://localhost:5000/api/leaves";
-const WARNINGS_API = "http://localhost:5000/api/warnings";
-const ATTENDANCE_API = "http://localhost:5000/api/attendance/stats";
+import { BASE_URL } from "../config";
+const LEAVES_API = `${BASE_URL}/api/leaves`;
+const WARNINGS_API = `${BASE_URL}/api/warnings`;
+const ATTENDANCE_API = `${BASE_URL}/api/attendance/stats`;
 
 export default function DashboardPage({ employees, showAddModal, user }) {
   const navigate = useNavigate();
@@ -187,7 +187,6 @@ export default function DashboardPage({ employees, showAddModal, user }) {
   const pendingLeavesCount = pendingLeaves.length;
   
   const activeWarnings = warnings.filter((w) => w.status === "Active");
-  const activeWarningsCount = activeWarnings.length;
 
   // Attendance metrics
   const totalActiveStaff = attendanceStats.totalActiveEmployees || activeEmployees || totalEmployees;

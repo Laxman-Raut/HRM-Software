@@ -7,6 +7,11 @@ import warningRoutes from "./routes/WarningRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js";
 import holidayRoutes from "./routes/holidayRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import announcementRoutes from "./routes/announcementRoutes.js";
+import resignationRoutes from "./routes/resignationRoutes.js";
+import documentRoutes from "./routes/documentRoutes.js";
+import salaryStructureRoutes from "./routes/salaryStructureRoutes.js";
+import payrollRoutes from "./routes/payrollRoutes.js";
 const app = express();
 
 // Middleware
@@ -30,6 +35,11 @@ app.use("/api/warnings", warningRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/holidays", holidayRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/announcements", announcementRoutes);
+app.use("/api/resignations", resignationRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/salary-structures", salaryStructureRoutes);
+app.use("/api/payroll", payrollRoutes);next
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error("Express Error Handler:", err);

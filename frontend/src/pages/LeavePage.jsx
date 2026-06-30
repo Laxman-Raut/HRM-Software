@@ -5,7 +5,8 @@ import AdminLeaveView from "../components/Leave/AdminLeaveView";
 import LeaveFormModal from "../components/Leave/LeaveFormModal";
 import "./LeavePage.css";
 
-const API_BASE_URL = "http://localhost:5000/api/leaves";
+import { BASE_URL } from "../config";
+const API_BASE_URL = `${BASE_URL}/api/leaves`;
 
 export default function LeavePage({ user, employees }) {
   const isAdminOrHr = user && user.role !== "Employee";

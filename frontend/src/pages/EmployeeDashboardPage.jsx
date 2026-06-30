@@ -19,7 +19,8 @@ import {
   Coffee,
 } from "lucide-react";
 
-const API_BASE = "http://localhost:5000/api";
+import { BASE_URL } from "../config";
+const API_BASE = `${BASE_URL}/api`;
 
 export default function EmployeeDashboardPage({ user, employees }) {
   const navigate = useNavigate();

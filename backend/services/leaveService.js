@@ -6,8 +6,7 @@ export const createLeaveService = async (leaveData) => {
     leaveType,
     startDate,
     endDate,
-    reason,
-  } = leaveData;
+    reason,} = leaveData;
 
   // Validate required fields
   if (!employee) {

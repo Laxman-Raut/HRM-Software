@@ -5,7 +5,8 @@ import EmployeeWarningView from "../components/Warning/EmployeeWarningView";
 import WarningFormModal from "../components/Warning/WarningFormModal";
 import "./WarningPage.css";
 
-const API_BASE_URL = "http://localhost:5000/api/warnings";
+import { BASE_URL } from "../config";
+const API_BASE_URL = `${BASE_URL}/api/warnings`;
 
 export default function WarningPage({ user, employees }) {
   const isAdminOrHr = user && user.role !== "Employee";

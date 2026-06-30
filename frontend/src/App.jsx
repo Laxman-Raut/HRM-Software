@@ -11,6 +11,9 @@ import AttendancePage from "./pages/AttendancePage";
 import WarningPage from "./pages/WarningPage";
 import LeavePage from "./pages/LeavePage";
 import HolidayPage from "./pages/HolidayPage";
+import AnnouncementPage from "./pages/AnnouncementPage";
+import ResignationPage from "./pages/ResignationPage";
+import DocumentPage from "./pages/DocumentPage";
 import EmployeeFormModal from "./components/Employee/EmployeeFormModal";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -18,8 +21,7 @@ import Toast from "./components/Common/Toast";
 import { Loader2, ServerCrash } from "lucide-react";
 import { getEmployeeDbId } from "./utils/idResolver";
 
-const API_BASE_URL = "http://localhost:5000/api/employees";
-
+import { API_BASE_URL, BASE_URL } from "./config";
 export default function App() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
@@ -278,7 +280,7 @@ export default function App() {
                 Backend Server Connection Failed
               </h3>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", maxWidth: "420px" }}>
-                We couldn't connect to `http://localhost:5000`. Ensure that the backend is running and the database link is configured correctly.
+                We couldn't connect to `{BASE_URL}`. Ensure that the backend is running and the database link is configured correctly.
               </p>
             </div>
             <button className="btn btn-primary" onClick={fetchEmployees}>
@@ -360,6 +362,30 @@ export default function App() {
               path="/holidays"
               element={
                 <HolidayPage
+                  user={user}
+                />
+              }
+            />
+            <Route
+              path="/announcements"
+              element={
+                <AnnouncementPage
+                  user={user}
+                />
+              }
+            />
+            <Route
+              path="/resignations"
+              element={
+                <ResignationPage
+                  user={user}
+                />
+              }
+            />
+            <Route
+              path="/documents"
+              element={
+                <DocumentPage
                   user={user}
                 />
               }
