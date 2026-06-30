@@ -143,7 +143,7 @@ export default function EmployeeFormFields({ formData, handleChange, errors, isE
 
       {/* Salary */}
       <div className="form-group">
-        <label className="form-label">Salary (USD/year)</label>
+        <label className="form-label">Salary (INR/year)</label>
         <input
           type="number"
           name="salary"
