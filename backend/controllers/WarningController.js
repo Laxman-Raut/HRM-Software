@@ -1,7 +1,8 @@
 import { createWarningService } from "../services/warningService.js";
 import Warning from "../models/Warning.js";
 import { createNotification } from "../services/notificationService.js";
-
+import sendEmail from "../utils/sendEmail.js";
+import warningEmail from "../templates/warning/warningEmail.js";
 // Create Warning
 export const createWarning = async (req, res) => {
   try {
@@ -15,8 +16,9 @@ export const createWarning = async (req, res) => {
     };
 
     const warning = await createWarningService(warningData);
+    await warning.populate("employee", "firstName lastName employeeId department email");
 
-    // 🔔 NOTIFY EMPLOYEE
+    //  NOTIFY EMPLOYEE
     try {
       await createNotification({
         title: "Warning Issued",
@@ -26,6 +28,19 @@ export const createWarning = async (req, res) => {
       });
     } catch (err) {
       console.error("Error creating notification for warning:", err);
+    }
+    if (warning.employee && warning.employee.email) {
+      try {
+        await sendEmail({
+          to: warning.employee.email,
+          subject: "⚠️ HR Warning Notice",
+          html: warningEmail(warning.employee, warning),
+        });
+      } catch (emailError) {
+        console.error("Warning email failed:", emailError.message);
+      }
+    } else {
+      console.warn("⚠️ Cannot send warning email: Employee email not found");
     }
 
     res.status(201).json({
@@ -90,7 +105,7 @@ export const updateWarningStatus = async (req, res) => {
       });
     }
 
-    // 🔔 NOTIFY EMPLOYEE
+    // NOTIFY EMPLOYEE
     try {
       await createNotification({
         title: "Warning Status Updated",
