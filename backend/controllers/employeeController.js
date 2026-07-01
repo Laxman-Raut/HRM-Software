@@ -1,5 +1,7 @@
 import Employee from "../models/Employee.js";
 import { createEmployeeService } from "../services/employeeService.js";
+import welcomeEmail from "../templates/employee/welcomeEmail.js";
+import sendEmail from "../utils/sendEmail.js";
 // Create Employee
 export const createEmployee = async (req, res) => {
   try {
@@ -8,7 +10,18 @@ export const createEmployee = async (req, res) => {
       profilePhoto: req.file ? req.file.path : "",
     };
 
+
     const employee = await createEmployeeService(employeeData);
+   
+    try {
+      await sendEmail({
+        to: employee.email,
+        subject: "🎉 Welcome to HRM System",
+        html: welcomeEmail(employee, req.body.password || ""),
+      });
+    } catch (emailErr) {
+      console.error("❌ Failed to send welcome email:", emailErr.message);
+    }
 
     res.status(201).json({
       success: true,

@@ -44,7 +44,7 @@ const warningSchema = new mongoose.Schema(
 
     issuedByRole: {
       type: String,
-      enum: ["Admin", "HR"],
+      enum: ["Admin", "HR", "Manager"],
       required: true,
     },
 

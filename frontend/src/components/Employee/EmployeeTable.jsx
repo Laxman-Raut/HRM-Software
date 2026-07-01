@@ -77,7 +77,7 @@ export default function EmployeeTable({
                 >
                   <Eye size={16} />
                 </button>
-                {user && user.role !== "Employee" && (
+                {user && (user.role === "Admin" || user.role === "HR") && (
                   <>
                     <button
                       className="btn-icon-only"

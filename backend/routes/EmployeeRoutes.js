@@ -26,7 +26,7 @@ router.post(
 router.get(
   "/",
   protect,
-  authorize("Admin", "HR"),
+  authorize("Admin", "HR", "Manager"),
   getAllEmployees
 );
 
@@ -34,7 +34,7 @@ router.get(
 router.get(
   "/:id",
   protect,
-  authorize("Admin", "HR"),
+  authorize("Admin", "HR", "Manager"),
   getEmployeeById
 );
 

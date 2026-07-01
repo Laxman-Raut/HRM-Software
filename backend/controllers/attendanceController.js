@@ -1,5 +1,6 @@
 import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
+import Setting from "../models/Setting.js";
 
 // Employee Check In
 export const checkIn = async (req, res) => {
@@ -50,18 +51,51 @@ export const checkIn = async (req, res) => {
       minute: "2-digit",
     });
 
+    const { workMode } = req.body;
+    let attendanceStatus = "Present";
+
+    if (workMode === "WFH") {
+      const settings = await Setting.findOne();
+      let wfhAllowed = false;
+
+      const defaultWfh = {
+        Admin: true,
+        HR: true,
+        Manager: true,
+        Employee: false
+      };
+
+      if (settings && settings.roleSettings && settings.roleSettings.length > 0) {
+        const roleConf = settings.roleSettings.find(r => r.role === req.user.role);
+        if (roleConf) {
+          wfhAllowed = !!roleConf.workFromHomeAllowed;
+        }
+      } else {
+        wfhAllowed = !!defaultWfh[req.user.role];
+      }
+
+      if (!wfhAllowed) {
+        return res.status(400).json({
+          success: false,
+          message: "Work From Home is not allowed for your role",
+        });
+      }
+
+      attendanceStatus = "WFH";
+    }
+
     // Create attendance
     const attendance = await Attendance.create({
       employee: employee._id,
       employeeId: employee.employeeId,
       date: today,
       checkIn: currentTime,
-      status: "Present",
+      status: attendanceStatus,
     });
 
     res.status(201).json({
       success: true,
-      message: "Check In Successful",
+      message: workMode === "WFH" ? "WFH Check In Successful" : "Check In Successful",
       data: attendance,
     });
   } catch (error) {
@@ -223,7 +257,7 @@ export const getAttendanceStats = async (req, res) => {
       // Employee stats
       const employeeId = req.user.employeeId;
       const records = await Attendance.find({ employeeId });
-      const presentCount = records.filter(r => r.status === "Present").length;
+      const presentCount = records.filter(r => r.status === "Present" || r.status === "WFH").length;
       const halfDayCount = records.filter(r => r.status === "Half Day").length;
 
       res.status(200).json({
@@ -240,7 +274,7 @@ export const getAttendanceStats = async (req, res) => {
       const activeEmployeesCount = await Employee.countDocuments({ employmentStatus: "Active" });
       const todayAttendance = await Attendance.find({ date: today });
 
-      const presentCount = todayAttendance.filter(r => r.status === "Present").length;
+      const presentCount = todayAttendance.filter(r => r.status === "Present" || r.status === "WFH").length;
       const halfDayCount = todayAttendance.filter(r => r.status === "Half Day").length;
       const checkedInCount = todayAttendance.length;
       const absentCount = Math.max(0, activeEmployeesCount - checkedInCount);

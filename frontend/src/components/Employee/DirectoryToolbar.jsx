@@ -86,7 +86,7 @@ export default function DirectoryToolbar({
           </button>
         </div>
 
-        {user && user.role !== "Employee" && (
+        {user && (user.role === "Admin" || user.role === "HR") && (
           <button className="btn btn-primary" onClick={showAddModal}>
             <UserMinus size={16} style={{ transform: "rotate(180deg)" }} />
             Add Employee

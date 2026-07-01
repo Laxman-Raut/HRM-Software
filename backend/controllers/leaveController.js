@@ -1,8 +1,11 @@
 import { createLeaveService } from "../services/leaveService.js";
 import Leave from "../models/Leave.js";
 import { createNotification } from "../services/notificationService.js";
-
+import sendEmail from "../utils/sendEmail.js";
+import leaveApprovedEmail from "../templates/leave/leaveApprovedEmail.js";
+import leaveRejectedEmail from "../templates/leave/leaveRejectedEmail.js";
 /**
+
  * APPLY LEAVE (CREATE LEAVE)
  */
 export const applyLeave = async (req, res) => {
@@ -23,7 +26,7 @@ export const applyLeave = async (req, res) => {
 
     const leave = await createLeaveService(leaveData);
 
-    // 🔔 NOTIFY HR
+    //  NOTIFY HR
     await createNotification({
       title: "New Leave Request",
       message: `${req.user.firstName || req.user.name || "Employee"} applied for leave`,
@@ -104,7 +107,7 @@ export const updateLeaveStatus = async (req, res) => {
     // Populate employee details for response consistency
     await leave.populate("employee", "firstName lastName employeeId department email");
 
-    // 🔔 NOTIFY EMPLOYEE
+    // NOTIFY EMPLOYEE
     if (status === "Approved") {
       await createNotification({
         title: "Leave Approved",
@@ -112,6 +115,19 @@ export const updateLeaveStatus = async (req, res) => {
         type: "SUCCESS",
         forRole: "Employee",
       });
+      if (leave.employee && leave.employee.email) {
+        try {
+          await sendEmail({
+            to: leave.employee.email,
+            subject: "Leave Request Approved",
+            html: leaveApprovedEmail(leave),
+          });
+        } catch (emailErr) {
+          console.error(" Failed to send leave approval email:", emailErr.message);
+        }
+      } else {
+        console.warn(" Cannot send leave approval email: Employee email not found");
+      }
     }
 
     if (status === "Rejected") {
@@ -121,6 +137,19 @@ export const updateLeaveStatus = async (req, res) => {
         type: "WARNING",
         forRole: "Employee",
       });
+      if (leave.employee && leave.employee.email) {
+        try {
+          await sendEmail({
+            to: leave.employee.email,
+            subject: "Leave Request Rejected",
+            html: leaveRejectedEmail(leave, remark),
+          });
+        } catch (emailErr) {
+          console.error("❌ Failed to send leave rejection email:", emailErr.message);
+        }
+      } else {
+        console.warn("⚠️ Cannot send leave rejection email: Employee email not found");
+      }
     }
 
     res.status(200).json({

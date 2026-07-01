@@ -30,6 +30,7 @@ export default function AttendancePage({ user, employees }) {
   });
   
   const [loading, setLoading] = useState(true);
+  const [wfhAllowed, setWfhAllowed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
 
@@ -91,24 +92,47 @@ export default function AttendancePage({ user, employees }) {
     loadData();
   }, [isAdmin]);
 
+  // Load permissions for non-admin to check if WFH is allowed
+  useEffect(() => {
+    if (isAdmin) return;
+    const fetchPermissions = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${BASE_URL}/api/settings/my-permissions`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          setWfhAllowed(!!json.data.permissions.workFromHomeAllowed);
+        }
+      } catch (err) {
+        console.error("Failed to load WFH settings permissions:", err);
+      }
+    };
+    fetchPermissions();
+  }, [isAdmin]);
+
   const showMessage = (msg, type = "success") => {
     setMessage({ text: msg, type });
     setTimeout(() => setMessage(null), 5000);
   };
 
   // Perform Check In
-  const handleCheckIn = async (empId = null) => {
+  const handleCheckIn = async (empId = null, wfh = false) => {
     setSubmitting(true);
     try {
       const token = localStorage.getItem("token");
-      const body = empId ? JSON.stringify({ employeeId: empId }) : JSON.stringify({});
+      const payload = {};
+      if (empId) payload.employeeId = empId;
+      if (wfh) payload.workMode = "WFH";
+
       const response = await fetch(`${API_BASE_URL}/check-in`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body
+        body: JSON.stringify(payload)
       });
       const data = await response.json();
       if (response.ok && data.success) {
@@ -214,6 +238,7 @@ export default function AttendancePage({ user, employees }) {
           handleCheckOut={handleCheckOut}
           stats={stats}
           history={history}
+          wfhAllowed={wfhAllowed}
         />
       ) : (
         /* ================== ADMIN ROLE ================== */

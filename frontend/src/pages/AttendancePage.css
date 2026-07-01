@@ -189,6 +189,16 @@
   border: 1px solid rgba(245, 158, 11, 0.15);
 }
 
+.badge-wfh {
+  background-color: var(--info-light);
+  color: var(--info);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-md);
+  font-size: 0.725rem;
+  font-weight: 600;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
 /* Filters for Admin Mode */
 .filters-row {
   display: flex;
@@ -285,4 +295,78 @@
   .form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.wfh-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.wfh-checkbox-container {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  padding-left: 28px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.wfh-checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.wfh-checkmark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  height: 18px;
+  width: 18px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.wfh-checkbox-container:hover input ~ .wfh-checkmark {
+  border-color: var(--text-muted);
+}
+
+.wfh-checkbox-container input:checked ~ .wfh-checkmark {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.wfh-checkbox-container input:disabled ~ .wfh-checkmark {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wfh-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.wfh-checkbox-container input:checked ~ .wfh-checkmark:after {
+  display: block;
+}
+
+.wfh-checkbox-container .wfh-checkmark:after {
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }

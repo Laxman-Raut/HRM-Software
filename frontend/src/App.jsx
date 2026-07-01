@@ -15,6 +15,8 @@ import AnnouncementPage from "./pages/AnnouncementPage";
 import ResignationPage from "./pages/ResignationPage";
 import DocumentPage from "./pages/DocumentPage";
 import PayrollPage from "./pages/PayrollPage";
+import BankDetailsPage from "./pages/BankDetailsPage";
+import SettingsPage from "./pages/SettingsPage";
 import EmployeeFormModal from "./components/Employee/EmployeeFormModal";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -40,6 +42,82 @@ export default function App() {
 
   // Theme state
   const [darkMode, setDarkMode] = useState(false);
+  const [themeColor, setThemeColor] = useState("blue");
+
+  const applyThemeColor = (color) => {
+    const colors = {
+      blue: {
+        primary: "#2563eb",
+        hover: "#1d4ed8",
+        gradient: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+        light: "rgba(37, 99, 235, 0.1)",
+        glow: "rgba(37, 99, 235, 0.08)"
+      },
+      emerald: {
+        primary: "#10b981",
+        hover: "#059669",
+        gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
+        light: "rgba(16, 185, 129, 0.1)",
+        glow: "rgba(16, 185, 129, 0.08)"
+      },
+      violet: {
+        primary: "#8b5cf6",
+        hover: "#7c3aed",
+        gradient: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
+        light: "rgba(139, 92, 246, 0.1)",
+        glow: "rgba(139, 92, 246, 0.08)"
+      },
+      amber: {
+        primary: "#f59e0b",
+        hover: "#d97706",
+        gradient: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+        light: "rgba(245, 158, 11, 0.1)",
+        glow: "rgba(245, 158, 11, 0.08)"
+      },
+      zinc: {
+        primary: "#71717a",
+        hover: "#52525b",
+        gradient: "linear-gradient(135deg, #71717a 0%, #a1a1aa 100%)",
+        light: "rgba(113, 113, 122, 0.1)",
+        glow: "rgba(113, 113, 122, 0.08)"
+      }
+    };
+
+    const active = colors[color] || colors.blue;
+    document.documentElement.style.setProperty("--primary", active.primary);
+    document.documentElement.style.setProperty("--primary-hover", active.hover);
+    document.documentElement.style.setProperty("--primary-gradient", active.gradient);
+    document.documentElement.style.setProperty("--primary-light", active.light);
+    document.documentElement.style.setProperty("--primary-glow", active.glow);
+  };
+
+  const loadSystemSettings = async () => {
+    if (!isAuthenticated) return;
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/api/settings/my-permissions`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          const { themeMode, themeColor: col } = json.data;
+
+          const userThemePreference = localStorage.getItem("themePreference");
+          if (userThemePreference) {
+            setDarkMode(userThemePreference === "dark");
+          } else {
+            setDarkMode(themeMode === "dark");
+          }
+
+          setThemeColor(col || "blue");
+          applyThemeColor(col || "blue");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load global theme settings:", err);
+    }
+  };
 
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
@@ -105,6 +183,14 @@ export default function App() {
 
   useEffect(() => {
     fetchEmployees();
+    loadSystemSettings();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    window.reloadSystemSettings = loadSystemSettings;
+    return () => {
+      delete window.reloadSystemSettings;
+    };
   }, [isAuthenticated]);
 
   useEffect(() => {
@@ -224,6 +310,11 @@ export default function App() {
     setFormModalOpen(true);
   };
 
+  const handleThemeToggle = (newVal) => {
+    setDarkMode(newVal);
+    localStorage.setItem("themePreference", newVal ? "dark" : "light");
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -254,7 +345,7 @@ export default function App() {
         {isAuthenticated && (
           <Navbar
             darkMode={darkMode}
-            setDarkMode={setDarkMode}
+            setDarkMode={handleThemeToggle}
             onLogout={handleLogout}
             setMobileOpen={setMobileOpen}
             user={user}
@@ -398,6 +489,25 @@ export default function App() {
                   user={user}
                   employees={employees}
                 />
+              }
+            />
+            <Route
+              path="/bank-details"
+              element={
+                <BankDetailsPage
+                  user={user}
+                  employees={employees}
+                />
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                user && user.role === "Admin" ? (
+                  <SettingsPage user={user} />
+                ) : (
+                  <Navigate to="/dashboard" replace />
+                )
               }
             />
           </Routes>

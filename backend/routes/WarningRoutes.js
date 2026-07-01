@@ -6,13 +6,13 @@ import {
   deleteWarning
 } from "../controllers/WarningController.js";
 import { protect } from "../middleware/authMiddleware.js";
-import { authorize } from "../middleware/roleMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", protect, authorize("Admin", "HR"), createWarning);
+router.post("/", protect, checkPermission("canIssueWarnings"), createWarning);
 router.get("/", protect, getWarnings);
-router.put("/:id", protect, authorize("Admin", "HR"), updateWarningStatus);
-router.delete("/:id", protect, authorize("Admin", "HR"), deleteWarning);
+router.put("/:id", protect, checkPermission("canIssueWarnings"), updateWarningStatus);
+router.delete("/:id", protect, checkPermission("canIssueWarnings"), deleteWarning);
 
 export default router;

@@ -9,6 +9,7 @@ import {
 } from "../controllers/payrollController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ const router = express.Router();
 router.post(
   "/generate",
   protect,
+  checkPermission("canManagePayroll"),
   generatePayroll
 );
 
@@ -23,6 +25,7 @@ router.post(
 router.get(
   "/",
   protect,
+  checkPermission("canManagePayroll"),
   getAllPayrolls
 );
 
@@ -37,6 +40,7 @@ router.get(
 router.put(
   "/:id",
   protect,
+  checkPermission("canManagePayroll"),
   updatePayrollStatus
 );
 
@@ -44,6 +48,7 @@ router.put(
 router.delete(
   "/:id",
   protect,
+  checkPermission("canManagePayroll"),
   deletePayroll
 );
 

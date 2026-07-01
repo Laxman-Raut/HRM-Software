@@ -22,13 +22,13 @@ const announcementSchema = new mongoose.Schema(
 
     createdByRole: {
       type: String,
-      enum: ["Admin", "HR"],
+      enum: ["Admin", "HR", "Manager"],
       required: true,
     },
 
     targetAudience: {
       type: String,
-      enum: ["ALL", "HR", "Employee"],
+      enum: ["ALL", "HR", "Manager", "Employee"],
       default: "ALL",
     },
 

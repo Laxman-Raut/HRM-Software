@@ -69,7 +69,7 @@ const leaveSchema = new mongoose.Schema(
 
     approvedByRole: {
       type: String,
-      enum: ["Admin", "HR"],
+      enum: ["Admin", "HR", "Manager"],
       default: null,
     },
 

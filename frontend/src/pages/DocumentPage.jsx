@@ -568,12 +568,13 @@ export default function DocumentPage({ user }) {
                     <X size={15} /> Reject
                   </button>
                   <button
+                 style={{ backgroundColor: "red" }}
                     type="button"
                     className="btn btn-success flex items-center gap-1"
                     disabled={reviewLoading}
                     onClick={() => handleVerifyDocument("Verified")}
                   >
-                    <Check size={15} /> Approve & Verify
+                    <Check size={15} /> Verify
                   </button>
                 </div>
               </div>

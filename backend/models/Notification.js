@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema(
 
     forRole: {
       type: String,
-      enum: ["Admin", "HR", "Employee", "ALL"],
+      enum: ["Admin", "HR", "Manager", "Employee", "ALL"],
       default: "ALL",
     },
 

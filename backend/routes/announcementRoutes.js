@@ -1,7 +1,7 @@
 import express from "express";
 import { createAnnouncement, getAnnouncements, deleteAnnouncement } from "../controllers/announcementController.js";
 import { protect } from "../middleware/authMiddleware.js";
-import { authorize } from "../middleware/roleMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 const router = express.Router();
 
@@ -9,9 +9,9 @@ const router = express.Router();
 router.get("/", protect, getAnnouncements);
 
 // Create Announcement (Admin & HR)
-router.post("/", protect, authorize("Admin", "HR"), createAnnouncement);
+router.post("/", protect, checkPermission("canCreateAnnouncements"), createAnnouncement);
 
 // Delete Announcement (Admin & HR)
-router.delete("/:id", protect, authorize("Admin", "HR"), deleteAnnouncement);
+router.delete("/:id", protect, checkPermission("canCreateAnnouncements"), deleteAnnouncement);
 
 export default router;

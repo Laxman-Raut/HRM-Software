@@ -11,19 +11,19 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// Get All Holidays (Admin, HR, Employee)
+// Get All Holidays (Admin, HR, Manager, Employee)
 router.get(
   "/",
   protect,
-  authorize("Admin", "HR", "Employee"),
+  authorize("Admin", "HR", "Manager", "Employee"),
   getAllHolidays
 );
 
-// Get Holiday By ID (Admin, HR, Employee)
+// Get Holiday By ID (Admin, HR, Manager, Employee)
 router.get(
   "/:id",
   protect,
-  authorize("Admin", "HR", "Employee"),
+  authorize("Admin", "HR", "Manager", "Employee"),
   getHolidayById
 );
 

@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import path from "path";
+dotenv.config();import path from "path";
 import { fileURLToPath } from "url";
 import bcrypt from "bcryptjs";
 import Admin from "./models/Admin.js";

@@ -60,7 +60,7 @@ export default function EmployeeDetailPage({ employees, onEdit, onDelete, user }
           Back to Directory
         </button>
         <div style={{ display: "flex", gap: "0.75rem" }}>
-          {user && user.role !== "Employee" && (
+          {user && (user.role === "Admin" || user.role === "HR") && (
             <>
               <button className="btn btn-secondary" onClick={() => onEdit(employee)}>
                 <Edit2 size={15} />

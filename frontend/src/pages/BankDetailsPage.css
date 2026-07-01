@@ -1,0 +1,22 @@
+/* Bank Details Page custom styling */
+
+.bank-details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.bank-details-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2rem;
+}
+
+/* Responsive details layout */
+@media (max-width: 600px) {
+  .bank-details-info-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}

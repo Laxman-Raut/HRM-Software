@@ -558,8 +558,9 @@ export default function PayrollPage({ user, employees }) {
                               </span>
                             </td>
                             <td className="text-right">
-                              <div className="actions-flex justify-end gap-2">
+                              <div className="actions-flex justify-end gap-2" >
                                 <button
+                                style={{backgroundColor: "blue"}}
                                   className="btn-table-action"
                                   title="View Payslip"
                                   onClick={() => setSelectedPayslip(payroll)}

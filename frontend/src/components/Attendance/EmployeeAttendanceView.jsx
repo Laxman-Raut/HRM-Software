@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Clock3, 
   Coffee, 
@@ -16,8 +16,19 @@ export default function EmployeeAttendanceView({
   handleCheckIn,
   handleCheckOut,
   stats,
-  history
+  history,
+  wfhAllowed
 }) {
+  const [isWfh, setIsWfh] = useState(false);
+
+  useEffect(() => {
+    if (todayStatus) {
+      setIsWfh(todayStatus.status === "WFH");
+    } else {
+      setIsWfh(false);
+    }
+  }, [todayStatus]);
+
   const formatTime = (dateObj) => {
     return dateObj.toLocaleTimeString("en-IN", {
       hour: "2-digit",
@@ -42,12 +53,28 @@ export default function EmployeeAttendanceView({
       <div className="clock-widget glass-card">
         <div className="digital-clock">{formatTime(time)}</div>
         <div className="clock-date">{formatDate(time)}</div>
+
+        {/* WFH Toggle checkbox */}
+        {wfhAllowed && (
+          <div className="wfh-toggle-wrapper">
+            <label className="wfh-checkbox-container">
+              <input
+                type="checkbox"
+                checked={isWfh}
+                disabled={submitting || !!todayStatus}
+                onChange={(e) => setIsWfh(e.target.checked)}
+              />
+              <span className="wfh-checkmark"></span>
+              <span>Work From Home (WFH)</span>
+            </label>
+          </div>
+        )}
         
         <div className="clock-actions">
           <button 
             className="btn btn-clock btn-clock-in"
             disabled={submitting || !!todayStatus}
-            onClick={() => handleCheckIn()}
+            onClick={() => handleCheckIn(null, isWfh)}
           >
             <Clock3 size={24} />
             <span>Check In</span>
@@ -68,12 +95,12 @@ export default function EmployeeAttendanceView({
           todayStatus.checkOut ? (
             <div className="status-badge-inline checked-out">
               <CheckCircle size={14} />
-              <span>Checked Out today at {todayStatus.checkOut}</span>
+              <span>Checked Out today at {todayStatus.checkOut} {todayStatus.status === "WFH" ? "(WFH)" : "(Office)"}</span>
             </div>
           ) : (
             <div className="status-badge-inline checked-in">
               <UserCheck size={14} />
-              <span>Checked In today at {todayStatus.checkIn}</span>
+              <span>Checked In today at {todayStatus.checkIn} {todayStatus.status === "WFH" ? "(WFH)" : "(Office)"}</span>
             </div>
           )
         ) : (
@@ -130,7 +157,12 @@ export default function EmployeeAttendanceView({
                     <td>{log.checkIn || "--"}</td>
                     <td>{log.checkOut || "--"}</td>
                     <td>
-                      <span className={log.status === "Present" ? "badge-present" : log.status === "Half Day" ? "badge-half-day" : "badge-absent"}>
+                      <span className={
+                        log.status === "Present" ? "badge-present" :
+                        log.status === "WFH" ? "badge-wfh" :
+                        log.status === "Half Day" ? "badge-half-day" :
+                        "badge-absent"
+                      }>
                         {log.status}
                       </span>
                     </td>
