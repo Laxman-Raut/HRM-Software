@@ -17,7 +17,7 @@ import {
 import { BASE_URL } from "../../config";
 const NOTIFICATIONS_API = `${BASE_URL}/api/notifications`;
 
-export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen, user }) {
+export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen, user, userPhoto }) {
   const location = useLocation();
   const [notifications, setNotifications] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -256,8 +256,12 @@ export default function Navbar({ darkMode, setDarkMode, onLogout, setMobileOpen,
 
         {/* Profile Avatar */}
         <div className="navbar-profile">
-          <div className="navbar-avatar">
-            <User size={16} />
+          <div className="navbar-avatar" style={{ overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {userPhoto ? (
+              <img src={userPhoto} alt="Profile" className="navbar-avatar-img" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", display: "block" }} />
+            ) : (
+              <User size={16} />
+            )}
           </div>
           <div className="navbar-user-details">
             <span className="navbar-username">{user && user.email ? user.email.split("@")[0] : "HR Manager"}</span>

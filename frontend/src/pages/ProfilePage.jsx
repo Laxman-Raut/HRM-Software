@@ -155,6 +155,9 @@ export default function ProfilePage({ user }) {
         showToast(hasProfile ? "Profile updated successfully!" : "Profile initialized successfully!", "success");
         setIsEditing(false);
         fetchProfile();
+        if (typeof window.reloadProfilePhoto === "function") {
+          window.reloadProfilePhoto();
+        }
       } else {
         showToast(data.message || "Failed to submit profile data", "error");
       }

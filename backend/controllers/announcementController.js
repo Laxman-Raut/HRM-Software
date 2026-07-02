@@ -26,7 +26,6 @@ export const createAnnouncement = async (req, res) => {
       expiryDate,
     });
 
-    // 📧 SMTP EMAIL LOGIC - Run in background to avoid blocking API response
     (async () => {
       try {
         const employees = await Employee.find({

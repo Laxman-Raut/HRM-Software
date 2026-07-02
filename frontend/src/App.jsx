@@ -48,6 +48,14 @@ export default function App() {
   // RBAC permissions state
   const [permissions, setPermissions] = useState({});
   const [systemRoles, setSystemRoles] = useState(["Admin", "HR", "Manager", "Employee"]);
+  const [userPhoto, setUserPhoto] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("user"));
+      return u?.profilePhoto || "";
+    } catch {
+      return "";
+    }
+  });
 
   const applyThemeColor = (color) => {
     const colors = {
@@ -131,6 +139,32 @@ export default function App() {
     }
   };
 
+  const loadProfilePhoto = async () => {
+    if (!isAuthenticated) return;
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/api/profile/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          const photo = json.data.profilePhoto || json.data.employee?.profilePhoto;
+          if (photo) {
+            setUserPhoto(photo);
+            const currentUser = JSON.parse(localStorage.getItem("user"));
+            if (currentUser && currentUser.profilePhoto !== photo) {
+              currentUser.profilePhoto = photo;
+              localStorage.setItem("user", JSON.stringify(currentUser));
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load user profile photo:", err);
+    }
+  };
+
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
   const [user, setUser] = useState(() => {
@@ -196,12 +230,15 @@ export default function App() {
   useEffect(() => {
     fetchEmployees();
     loadSystemSettings();
+    loadProfilePhoto();
   }, [isAuthenticated]);
 
   useEffect(() => {
     window.reloadSystemSettings = loadSystemSettings;
+    window.reloadProfilePhoto = loadProfilePhoto;
     return () => {
       delete window.reloadSystemSettings;
+      delete window.reloadProfilePhoto;
     };
   }, [isAuthenticated]);
 
@@ -362,6 +399,7 @@ export default function App() {
             onLogout={handleLogout}
             setMobileOpen={setMobileOpen}
             user={user}
+            userPhoto={userPhoto}
           />
         )}
 

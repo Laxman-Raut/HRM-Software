@@ -69,6 +69,7 @@ export const login = async (req, res) => {
         firstName: user.firstName || null,
         lastName: user.lastName || null,
         name: user.firstName ? `${user.firstName} ${user.lastName}` : (user.name || "Admin"),
+        profilePhoto: user.profilePhoto || null,
       },
     });
   } catch (error) {
