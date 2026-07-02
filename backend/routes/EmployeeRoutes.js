@@ -6,7 +6,7 @@ import {
   updateEmployee,
   deleteEmployee,
 } from "../controllers/employeeController.js";
-import { authorize } from "../middleware/roleMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 import { protect } from "../middleware/authMiddleware.js";
 import upload from "../middleware/upload.js";
@@ -17,7 +17,7 @@ const router = express.Router();
 router.post(
   "/",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canManageEmployees"),
   upload.single("profilePhoto"),
   createEmployee
 );
@@ -26,7 +26,7 @@ router.post(
 router.get(
   "/",
   protect,
-  authorize("Admin", "HR", "Manager"),
+  checkPermission("canViewEmployees"),
   getAllEmployees
 );
 
@@ -34,7 +34,7 @@ router.get(
 router.get(
   "/:id",
   protect,
-  authorize("Admin", "HR", "Manager"),
+  checkPermission("canViewEmployees"),
   getEmployeeById
 );
 
@@ -42,7 +42,7 @@ router.get(
 router.put(
   "/:id",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canManageEmployees"),
   upload.single("profilePhoto"),
   updateEmployee
 );
@@ -51,7 +51,7 @@ router.put(
 router.delete(
   "/:id",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canManageEmployees"),
   deleteEmployee
 );
 export default router;

@@ -46,18 +46,18 @@ export const createAnnouncement = async (req, res) => {
           emailPromises.push(
             sendEmail({
               to: emp.email,
-              subject: `📢 New Announcement - ${priority || "INFO"}`,
+              subject: ` New Announcement - ${priority || "INFO"}`,
               html: announcementEmail(announcement),
             }).catch((err) => {
-              console.error(`❌ Failed to send announcement email to ${emp.email}:`, err.message);
+              console.error(` Failed to send announcement email to ${emp.email}:`, err.message);
             })
           );
         }
 
         await Promise.all(emailPromises);
-        console.log("✅ Announcement emails sent successfully");
+        console.log(" Announcement emails sent successfully");
       } catch (emailError) {
-        console.error("❌ Announcement Email Error:", emailError.message);
+        console.error(" Announcement Email Error:", emailError.message);
       }
     })();
 

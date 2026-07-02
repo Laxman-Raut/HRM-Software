@@ -146,7 +146,7 @@ export default function EmployeeDashboardPage({ user, employees }) {
       icon: <Shield size={22} />,
       color: "#f59e0b",
       gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-      path: "/employees",
+      path: "/profile",
       desc: "View & update details",
     },
   ];

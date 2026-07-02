@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function EmployeeFormFields({ formData, handleChange, errors, isEdit }) {
+export default function EmployeeFormFields({ formData, handleChange, errors, isEdit, systemRoles = [] }) {
   return (
     <div className="form-grid">
       {/* Employee ID */}
@@ -126,6 +126,24 @@ export default function EmployeeFormFields({ formData, handleChange, errors, isE
           className="form-control"
         />
         {errors.designation && <span className="form-error">{errors.designation}</span>}
+      </div>
+
+      {/* System Role */}
+      <div className="form-group">
+        <label className="form-label">System Role *</label>
+        <select
+          name="role"
+          value={formData.role || "Employee"}
+          onChange={handleChange}
+          className="form-control"
+          style={{ cursor: "pointer" }}
+        >
+          {systemRoles.map((roleName) => (
+            <option key={roleName} value={roleName}>
+              {roleName}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Joining Date */}

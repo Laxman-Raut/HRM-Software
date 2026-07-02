@@ -7,47 +7,45 @@ import {
   deleteHoliday,
 } from "../controllers/holidayController.js";
 import { protect } from "../middleware/authMiddleware.js";
-import { authorize } from "../middleware/roleMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 const router = express.Router();
 
-// Get All Holidays (Admin, HR, Manager, Employee)
+// Get All Holidays (All authenticated users)
 router.get(
   "/",
   protect,
-  authorize("Admin", "HR", "Manager", "Employee"),
   getAllHolidays
 );
 
-// Get Holiday By ID (Admin, HR, Manager, Employee)
+// Get Holiday By ID (All authenticated users)
 router.get(
   "/:id",
   protect,
-  authorize("Admin", "HR", "Manager", "Employee"),
   getHolidayById
 );
 
-// Create Holiday (Admin, HR)
+// Create Holiday
 router.post(
   "/",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canManageHolidays"),
   createHoliday
 );
 
-// Update Holiday (Admin, HR)
+// Update Holiday
 router.put(
   "/:id",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canManageHolidays"),
   updateHoliday
 );
 
-// Delete Holiday (Admin, HR)
+// Delete Holiday
 router.delete(
   "/:id",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canManageHolidays"),
   deleteHoliday
 );
 

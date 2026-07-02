@@ -27,6 +27,12 @@ export const getSettings = async (req, res) => {
             canCreateAnnouncements: true,
             canIssueWarnings: true,
             workFromHomeAllowed: true,
+            canManageEmployees: true,
+            canViewEmployees: true,
+            canManageHolidays: true,
+            canManageSettings: true,
+            canManageResignations: true,
+            canViewDocuments: true,
           },
           {
             role: "HR",
@@ -37,6 +43,12 @@ export const getSettings = async (req, res) => {
             canCreateAnnouncements: true,
             canIssueWarnings: true,
             workFromHomeAllowed: true,
+            canManageEmployees: true,
+            canViewEmployees: true,
+            canManageHolidays: true,
+            canManageSettings: false,
+            canManageResignations: true,
+            canViewDocuments: true,
           },
           {
             role: "Manager",
@@ -47,6 +59,12 @@ export const getSettings = async (req, res) => {
             canCreateAnnouncements: true,
             canIssueWarnings: true,
             workFromHomeAllowed: true,
+            canManageEmployees: false,
+            canViewEmployees: true,
+            canManageHolidays: false,
+            canManageSettings: false,
+            canManageResignations: false,
+            canViewDocuments: false,
           },
           {
             role: "Employee",
@@ -57,6 +75,12 @@ export const getSettings = async (req, res) => {
             canCreateAnnouncements: false,
             canIssueWarnings: false,
             workFromHomeAllowed: false,
+            canManageEmployees: false,
+            canViewEmployees: false,
+            canManageHolidays: false,
+            canManageSettings: false,
+            canManageResignations: false,
+            canViewDocuments: false,
           },
         ],
       });
@@ -127,6 +151,12 @@ export const getMyPermissions = async (req, res) => {
         canCreateAnnouncements: true,
         canIssueWarnings: true,
         workFromHomeAllowed: true,
+        canManageEmployees: true,
+        canViewEmployees: true,
+        canManageHolidays: true,
+        canManageSettings: true,
+        canManageResignations: true,
+        canViewDocuments: true,
       },
       HR: {
         maxLeavesPerYear: 20,
@@ -136,6 +166,12 @@ export const getMyPermissions = async (req, res) => {
         canCreateAnnouncements: true,
         canIssueWarnings: true,
         workFromHomeAllowed: true,
+        canManageEmployees: true,
+        canViewEmployees: true,
+        canManageHolidays: true,
+        canManageSettings: false,
+        canManageResignations: true,
+        canViewDocuments: true,
       },
       Manager: {
         maxLeavesPerYear: 18,
@@ -145,6 +181,12 @@ export const getMyPermissions = async (req, res) => {
         canCreateAnnouncements: true,
         canIssueWarnings: true,
         workFromHomeAllowed: true,
+        canManageEmployees: false,
+        canViewEmployees: true,
+        canManageHolidays: false,
+        canManageSettings: false,
+        canManageResignations: false,
+        canViewDocuments: false,
       },
       Employee: {
         maxLeavesPerYear: 15,
@@ -154,6 +196,12 @@ export const getMyPermissions = async (req, res) => {
         canCreateAnnouncements: false,
         canIssueWarnings: false,
         workFromHomeAllowed: false,
+        canManageEmployees: false,
+        canViewEmployees: false,
+        canManageHolidays: false,
+        canManageSettings: false,
+        canManageResignations: false,
+        canViewDocuments: false,
       },
     };
 
@@ -166,10 +214,15 @@ export const getMyPermissions = async (req, res) => {
       }
     }
 
+    const roles = settings && settings.roleSettings && settings.roleSettings.length > 0
+      ? settings.roleSettings.map(r => r.role)
+      : ["Admin", "HR", "Manager", "Employee"];
+
     return res.status(200).json({
       success: true,
       data: {
         permissions,
+        roles,
         themeMode: settings ? settings.themeMode : "dark",
         themeColor: settings ? settings.themeColor : "blue",
         companyName: settings ? settings.companyName : "HRM Portal",

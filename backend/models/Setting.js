@@ -4,7 +4,6 @@ const roleSettingSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ["Admin", "HR", "Manager", "Employee"],
   },
   maxLeavesPerYear: {
     type: Number,
@@ -31,6 +30,30 @@ const roleSettingSchema = new mongoose.Schema({
     default: false,
   },
   workFromHomeAllowed: {
+    type: Boolean,
+    default: false,
+  },
+  canManageEmployees: {
+    type: Boolean,
+    default: false,
+  },
+  canViewEmployees: {
+    type: Boolean,
+    default: false,
+  },
+  canManageHolidays: {
+    type: Boolean,
+    default: false,
+  },
+  canManageSettings: {
+    type: Boolean,
+    default: false,
+  },
+  canManageResignations: {
+    type: Boolean,
+    default: false,
+  },
+  canViewDocuments: {
     type: Boolean,
     default: false,
   },

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, Save, AlertCircle } from "lucide-react";
 import EmployeeFormFields from "./EmployeeFormFields";
 
-export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee }) {
+export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee, systemRoles = [] }) {
   const isEdit = !!employee;
   const initialForm = {
     employeeId: "",
@@ -18,6 +18,7 @@ export default function EmployeeFormModal({ isOpen, onClose, onSubmit, employee 
     employmentStatus: "Active",
     salary: "",
     profilePhoto: "",
+    role: "Employee",
   };
 
   const [formData, setFormData] = useState(initialForm);
@@ -227,6 +228,7 @@ const handleImageChange = (e) => {
               handleChange={handleChange}
               errors={errors}
               isEdit={isEdit}
+              systemRoles={systemRoles}
             />
           </div>
 

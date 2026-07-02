@@ -22,9 +22,7 @@ export const login = async (req, res) => {
       user = await Employee.findOne({ email: lowerEmail });
 
       if (user) {
-        const isHrDept = user.department === "HR";
-        const isHrDesignation = user.designation && /hr|human resource|admin/i.test(user.designation);
-        role = (isHrDept || isHrDesignation) ? "HR" : (user.role || "Employee");
+        role = user.role || "Employee";
       }
     }
 

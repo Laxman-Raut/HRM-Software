@@ -8,6 +8,7 @@ export default function Sidebar({
   mobileOpen,
   setMobileOpen,
   user,
+  permissions = {},
 }) {
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
@@ -37,7 +38,7 @@ export default function Sidebar({
           <span className="nav-text">Dashboard</span>
         </NavLink>
 
-        {user && user.role !== "Employee" && (
+        {user && (user.role === "Admin" || permissions.canViewEmployees || permissions.canManageEmployees) && (
           <NavLink
             to="/employees"
             className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
@@ -130,7 +131,7 @@ export default function Sidebar({
           <span className="nav-text">Bank Details</span>
         </NavLink>
 
-        {user && user.role === "Admin" && (
+        {user && (user.role === "Admin" || permissions.canManageSettings) && (
           <NavLink
             to="/settings"
             className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
@@ -142,7 +143,12 @@ export default function Sidebar({
         )}
       </nav>
 
-      <div className="sidebar-footer">
+      <NavLink
+        to="/profile"
+        className="sidebar-footer"
+        onClick={() => setMobileOpen && setMobileOpen(false)}
+        style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}
+      >
         <div className="user-avatar">
           <User size={18} />
         </div>
@@ -150,7 +156,7 @@ export default function Sidebar({
           <span className="user-name">{user && user.email ? user.email.split("@")[0] : "HR Manager"}</span>
           <span className="user-role">{user && user.role ? user.role : "Administrator"}</span>
         </div>
-      </div>
+      </NavLink>
     </aside>
   );
 }

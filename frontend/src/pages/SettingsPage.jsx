@@ -13,7 +13,9 @@ import {
   Calendar,
   Layers,
   Globe,
-  Hash
+  Hash,
+  Plus,
+  Trash2
 } from "lucide-react";
 import "./SettingsPage.css";
 
@@ -21,8 +23,8 @@ import { BASE_URL } from "../config";
 const API_BASE_URL = `${BASE_URL}/api/settings`;
 
 export default function SettingsPage({ user }) {
-  // Guard access to Admin role
-  const isAdmin = user && user.role === "Admin";
+  // Guard access to Admin role (or user with settings permission)
+  const isAdmin = user && (user.role === "Admin" || user.role === "HR");
 
   const [settings, setSettings] = useState({
     companyName: "",
@@ -36,10 +38,61 @@ export default function SettingsPage({ user }) {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
   const [activeTab, setActiveTab] = useState("general"); // "general" | "roles"
+  const [newRoleName, setNewRoleName] = useState("");
 
   const showToast = (msg, type = "success") => {
     setToast({ text: msg, type });
     setTimeout(() => setToast(null), 4500);
+  };
+
+  const handleAddRole = () => {
+    if (!newRoleName.trim()) {
+      showToast("Please enter a role name", "error");
+      return;
+    }
+    const name = newRoleName.trim();
+    if (settings.roleSettings.some(r => r.role.toLowerCase() === name.toLowerCase())) {
+      showToast("This role already exists", "error");
+      return;
+    }
+
+    const newRoleObj = {
+      role: name,
+      maxLeavesPerYear: 15,
+      canApproveLeaves: false,
+      canManageAttendance: false,
+      canManagePayroll: false,
+      canCreateAnnouncements: false,
+      canIssueWarnings: false,
+      workFromHomeAllowed: false,
+      canManageEmployees: false,
+      canViewEmployees: false,
+      canManageHolidays: false,
+      canManageSettings: false,
+      canManageResignations: false,
+      canViewDocuments: false,
+    };
+
+    setSettings(prev => ({
+      ...prev,
+      roleSettings: [...prev.roleSettings, newRoleObj]
+    }));
+    setNewRoleName("");
+    showToast(`Role "${name}" added to layout. Click "Save Settings" to persist.`, "success");
+  };
+
+  const handleDeleteRole = (roleName) => {
+    const protectedRoles = ["Admin", "HR", "Manager", "Employee"];
+    if (protectedRoles.includes(roleName)) {
+      showToast("Cannot delete a default system role", "error");
+      return;
+    }
+
+    setSettings(prev => ({
+      ...prev,
+      roleSettings: prev.roleSettings.filter(r => r.role !== roleName)
+    }));
+    showToast(`Role "${roleName}" removed. Click "Save Settings" to persist.`, "success");
   };
 
   useEffect(() => {
@@ -447,8 +500,31 @@ export default function SettingsPage({ user }) {
               </div>
 
               <div className="card-body">
+                {/* Dynamic Role Creator */}
+                <div className="dynamic-role-creator" style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem", padding: "1rem", background: "rgba(255,255,255,0.02)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", alignItems: "center", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", flex: "1", minWidth: "200px" }}>
+                    <label style={{ fontSize: "0.75rem", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>Create Custom Role</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Intern, Team Lead, Finance Officer"
+                      value={newRoleName}
+                      onChange={(e) => setNewRoleName(e.target.value)}
+                      style={{ background: "rgba(0,0,0,0.2)", border: "1px solid var(--border-color)", color: "var(--text-primary)", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-md)", fontSize: "0.875rem" }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddRole}
+                    className="btn btn-primary"
+                    style={{ display: "flex", alignItems: "center", gap: "0.35rem", minHeight: "auto", padding: "0.55rem 1rem", marginTop: "1.2rem" }}
+                  >
+                    <Plus size={16} />
+                    <span>Add Role</span>
+                  </button>
+                </div>
+
                 {settings.roleSettings && settings.roleSettings.length > 0 ? (
-                  <div className="roles-table-wrapper">
+                  <div className="roles-table-wrapper" style={{ overflowX: "auto" }}>
                     <table className="roles-config-table">
                       <thead>
                         <tr>
@@ -460,14 +536,34 @@ export default function SettingsPage({ user }) {
                           <th>Create Announcements</th>
                           <th>Issue Warnings</th>
                           <th>Allow WFH</th>
+                          <th>Manage Employees</th>
+                          <th>View Employees</th>
+                          <th>Manage Holidays</th>
+                          <th>Manage Settings</th>
+                          <th>Manage Resignations</th>
+                          <th>View Documents</th>
                         </tr>
                       </thead>
                       <tbody>
                         {settings.roleSettings.map((roleConf) => (
                           <tr key={roleConf.role} className="role-config-row">
-                            <td className="role-name-cell">
-                              <Layers size={14} className="role-icon" />
-                              <span>{roleConf.role}</span>
+                            <td className="role-name-cell" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                <Layers size={14} className="role-icon" />
+                                <span>{roleConf.role}</span>
+                              </div>
+                              {!["Admin", "HR", "Manager", "Employee"].includes(roleConf.role) && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteRole(roleConf.role)}
+                                  style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", opacity: "0.7", padding: "0.25rem", borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                  title="Delete custom role"
+                                  onMouseOver={(e) => e.currentTarget.style.opacity = "1"}
+                                  onMouseOut={(e) => e.currentTarget.style.opacity = "0.7"}
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              )}
                             </td>
                             <td>
                               <div className="table-input-wrapper">
@@ -583,6 +679,108 @@ export default function SettingsPage({ user }) {
                                     handleRoleConfigChange(
                                       roleConf.role,
                                       "workFromHomeAllowed",
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                                <span className="checkmark"></span>
+                              </label>
+                            </td>
+                            <td>
+                              <label className="checkbox-container">
+                                <input
+                                  type="checkbox"
+                                  checked={roleConf.canManageEmployees || false}
+                                  disabled={roleConf.role === "Admin"}
+                                  onChange={(e) =>
+                                    handleRoleConfigChange(
+                                      roleConf.role,
+                                      "canManageEmployees",
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                                <span className="checkmark"></span>
+                              </label>
+                            </td>
+                            <td>
+                              <label className="checkbox-container">
+                                <input
+                                  type="checkbox"
+                                  checked={roleConf.canViewEmployees || false}
+                                  disabled={roleConf.role === "Admin"}
+                                  onChange={(e) =>
+                                    handleRoleConfigChange(
+                                      roleConf.role,
+                                      "canViewEmployees",
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                                <span className="checkmark"></span>
+                              </label>
+                            </td>
+                            <td>
+                              <label className="checkbox-container">
+                                <input
+                                  type="checkbox"
+                                  checked={roleConf.canManageHolidays || false}
+                                  disabled={roleConf.role === "Admin"}
+                                  onChange={(e) =>
+                                    handleRoleConfigChange(
+                                      roleConf.role,
+                                      "canManageHolidays",
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                                <span className="checkmark"></span>
+                              </label>
+                            </td>
+                            <td>
+                              <label className="checkbox-container">
+                                <input
+                                  type="checkbox"
+                                  checked={roleConf.canManageSettings || false}
+                                  disabled={roleConf.role === "Admin"}
+                                  onChange={(e) =>
+                                    handleRoleConfigChange(
+                                      roleConf.role,
+                                      "canManageSettings",
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                                <span className="checkmark"></span>
+                              </label>
+                            </td>
+                            <td>
+                              <label className="checkbox-container">
+                                <input
+                                  type="checkbox"
+                                  checked={roleConf.canManageResignations || false}
+                                  disabled={roleConf.role === "Admin"}
+                                  onChange={(e) =>
+                                    handleRoleConfigChange(
+                                      roleConf.role,
+                                      "canManageResignations",
+                                      e.target.checked
+                                    )
+                                  }
+                                />
+                                <span className="checkmark"></span>
+                              </label>
+                            </td>
+                            <td>
+                              <label className="checkbox-container">
+                                <input
+                                  type="checkbox"
+                                  checked={roleConf.canViewDocuments || false}
+                                  disabled={roleConf.role === "Admin"}
+                                  onChange={(e) =>
+                                    handleRoleConfigChange(
+                                      roleConf.role,
+                                      "canViewDocuments",
                                       e.target.checked
                                     )
                                   }

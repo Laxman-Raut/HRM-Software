@@ -14,6 +14,7 @@ import salaryStructureRoutes from "./routes/salaryStructureRoutes.js";
 import payrollRoutes from "./routes/payrollRoutes.js";
 import bankDetailsRoutes from "./routes/bankDetailsRoutes.js";
 import settingRoutes from "./routes/settingRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 const app = express();
 
 // Middleware
@@ -44,6 +45,7 @@ app.use("/api/salary-structures", salaryStructureRoutes);
 app.use("/api/payroll", payrollRoutes);
 app.use("/api/bank-details", bankDetailsRoutes);
 app.use("/api/settings", settingRoutes);
+app.use("/api/profile", profileRoutes);
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error("Express Error Handler:", err);

@@ -8,24 +8,22 @@ import {
 } from "../controllers/documentController.js";
 import upload from "../middleware/uploadDocument.js";
 import { protect } from "../middleware/authMiddleware.js";
-import { authorize } from "../middleware/roleMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 const router = express.Router();
 
-// Employee uploads document
+// Employee uploads document (all authenticated users)
 router.post(
   "/upload",
   protect,
-  authorize("Employee"),
   upload.single("document"),
   uploadDocument
 );
 
-// Employee views own documents
+// Employee views own documents (all authenticated users)
 router.get(
   "/my",
   protect,
-  authorize("Employee"),
   getMyDocuments
 );
 
@@ -33,7 +31,7 @@ router.get(
 router.get(
   "/",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canViewDocuments"),
   getAllDocuments
 );
 
@@ -41,7 +39,7 @@ router.get(
 router.put(
   "/:id/verify",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canViewDocuments"),
   verifyDocument
 );
 

@@ -17,6 +17,7 @@ import DocumentPage from "./pages/DocumentPage";
 import PayrollPage from "./pages/PayrollPage";
 import BankDetailsPage from "./pages/BankDetailsPage";
 import SettingsPage from "./pages/SettingsPage";
+import ProfilePage from "./pages/ProfilePage";
 import EmployeeFormModal from "./components/Employee/EmployeeFormModal";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -43,6 +44,10 @@ export default function App() {
   // Theme state
   const [darkMode, setDarkMode] = useState(false);
   const [themeColor, setThemeColor] = useState("blue");
+
+  // RBAC permissions state
+  const [permissions, setPermissions] = useState({});
+  const [systemRoles, setSystemRoles] = useState(["Admin", "HR", "Manager", "Employee"]);
 
   const applyThemeColor = (color) => {
     const colors = {
@@ -101,7 +106,7 @@ export default function App() {
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
-          const { themeMode, themeColor: col } = json.data;
+          const { themeMode, themeColor: col, permissions: perms, roles } = json.data;
 
           const userThemePreference = localStorage.getItem("themePreference");
           if (userThemePreference) {
@@ -112,6 +117,13 @@ export default function App() {
 
           setThemeColor(col || "blue");
           applyThemeColor(col || "blue");
+
+          if (perms) {
+            setPermissions(perms);
+          }
+          if (roles && roles.length > 0) {
+            setSystemRoles(roles);
+          }
         }
       }
     } catch (err) {
@@ -332,6 +344,7 @@ export default function App() {
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}
           user={user}
+          permissions={permissions}
         />
       )}
 
@@ -503,11 +516,17 @@ export default function App() {
             <Route
               path="/settings"
               element={
-                user && user.role === "Admin" ? (
+                user && (user.role === "Admin" || permissions.canManageSettings) ? (
                   <SettingsPage user={user} />
                 ) : (
                   <Navigate to="/dashboard" replace />
                 )
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProfilePage user={user} />
               }
             />
           </Routes>
@@ -520,6 +539,7 @@ export default function App() {
         onClose={() => setFormModalOpen(false)}
         onSubmit={formEmployee ? handleUpdateEmployee : handleCreateEmployee}
         employee={formEmployee}
+        systemRoles={systemRoles}
       />
 
       <Toast toasts={toasts} setToasts={setToasts} />

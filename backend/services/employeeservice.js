@@ -16,6 +16,7 @@ export const createEmployeeService = async (employeeData) => {
     employmentStatus,
     salary,
     profilePhoto,
+    role,
   } = employeeData;
 
   // Check Employee ID
@@ -48,7 +49,7 @@ export const createEmployeeService = async (employeeData) => {
   // salary comes as a string from multipart FormData — convert to number explicitly
   const parsedSalary = salary !== undefined && salary !== "" ? parseFloat(salary) : 0;
 
-  const employeeRole = department === "HR" ? "HR" : "Employee";
+  const employeeRole = role || "Employee";
 
   // Create Employee
   const employee = await Employee.create({

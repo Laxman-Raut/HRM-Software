@@ -84,9 +84,6 @@ export const updateEmployee = async (req, res) => {
     if (req.file) {
       updateData.profilePhoto = req.file.path;
     }
-    if (updateData.department) {
-      updateData.role = updateData.department === "HR" ? "HR" : "Employee";
-    }
     const employee = await Employee.findByIdAndUpdate(
       req.params.id,
       updateData,

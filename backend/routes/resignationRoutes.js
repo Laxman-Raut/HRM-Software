@@ -9,7 +9,7 @@ import {
 } from "../controllers/resignationController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
-import { authorize } from "../middleware/roleMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 const router = express.Router();
 
@@ -23,7 +23,6 @@ Employee Routes
 router.post(
   "/",
   protect,
-  authorize("Employee"),
   createResignation
 );
 
@@ -31,7 +30,6 @@ router.post(
 router.get(
   "/my",
   protect,
-  authorize("Employee"),
   getMyResignation
 );
 
@@ -45,7 +43,7 @@ Admin / HR Routes
 router.get(
   "/",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canManageResignations"),
   getAllResignations
 );
 
@@ -53,7 +51,7 @@ router.get(
 router.put(
   "/:id",
   protect,
-  authorize("Admin", "HR"),
+  checkPermission("canManageResignations"),
   updateResignationStatus
 );
 
