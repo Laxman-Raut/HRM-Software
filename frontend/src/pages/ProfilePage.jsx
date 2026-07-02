@@ -18,7 +18,9 @@ import {
   FileText,
   UserCheck,
   Code,
-  Link2
+  Link2,
+  TrendingUp,
+  ArrowRight
 } from "lucide-react";
 import "./ProfilePage.css";
 import { BASE_URL } from "../config";
@@ -31,8 +33,9 @@ export default function ProfilePage({ user }) {
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
-  const [activeTab, setActiveTab] = useState("personal"); // "personal" | "address" | "emergency"
+  const [activeTab, setActiveTab] = useState("personal"); // "personal" | "address" | "emergency" | "promotions"
   const [toast, setToast] = useState(null);
+  const [promotions, setPromotions] = useState([]);
 
   const [formData, setFormData] = useState({
     phone: "",
@@ -112,8 +115,27 @@ export default function ProfilePage({ user }) {
     }
   };
 
+  const fetchEmployeePromotions = async (empId) => {
+    if (!empId) return;
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/api/promotions/employee/${empId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPromotions(data.data || []);
+      }
+    } catch (err) {
+      console.error("Failed to load user promotions:", err);
+    }
+  };
+
   useEffect(() => {
     fetchProfile();
+    if (user?.id) {
+      fetchEmployeePromotions(user.id);
+    }
   }, [user]);
 
   const handleChange = (e) => {
@@ -347,6 +369,10 @@ export default function ProfilePage({ user }) {
             <button className={`tab-btn ${activeTab === "emergency" ? "active" : ""}`} onClick={() => setActiveTab("emergency")}>
               <Heart size={16} />
               <span>Emergency Contact</span>
+            </button>
+            <button className={`tab-btn ${activeTab === "promotions" ? "active" : ""}`} onClick={() => setActiveTab("promotions")}>
+              <TrendingUp size={16} />
+              <span>Promotions</span>
             </button>
           </div>
 
@@ -685,6 +711,86 @@ export default function ProfilePage({ user }) {
                     )}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === "promotions" && (
+              <div className="tab-pane animate-fade">
+                <div className="details-section-title">
+                  <TrendingUp size={18} className="icon-title" />
+                  <h3>Promotion & Career Milestones</h3>
+                </div>
+
+                {promotions.length === 0 ? (
+                  <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>
+                    <p style={{ fontSize: "0.9rem" }}>No promotion events logged in your profile history yet.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1rem" }}>
+                    {promotions.map((promo) => (
+                      <div key={promo._id} className="timeline-item" style={{
+                        background: "rgba(255, 255, 255, 0.02)",
+                        border: "1px solid var(--border-color)",
+                        borderRadius: "var(--radius-lg)",
+                        padding: "1.25rem",
+                        position: "relative"
+                      }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                          <h4 style={{ color: "var(--text-primary)", fontWeight: "600", fontSize: "0.95rem", margin: 0 }}>
+                            {promo.promotionTitle}
+                          </h4>
+                          <span style={{ fontSize: "0.8rem", color: "var(--primary)", fontWeight: "600" }}>
+                            {new Date(promo.effectiveDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                          </span>
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", fontSize: "0.85rem" }}>
+                          <div>
+                            <span style={{ display: "block", color: "var(--text-secondary)", fontSize: "0.75rem", textTransform: "uppercase", marginBottom: "0.25rem" }}>Designation Upgrade</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                              <span style={{ textDecoration: "line-through", opacity: 0.6 }}>{promo.previousDesignation}</span>
+                              <ArrowRight size={12} style={{ opacity: 0.5 }} />
+                              <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>{promo.newDesignation}</span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <span style={{ display: "block", color: "var(--text-secondary)", fontSize: "0.75rem", textTransform: "uppercase", marginBottom: "0.25rem" }}>Department Change</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                              <span style={{ textDecoration: "line-through", opacity: 0.6 }}>{promo.previousDepartment}</span>
+                              <ArrowRight size={12} style={{ opacity: 0.5 }} />
+                              <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>{promo.newDepartment}</span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <span style={{ display: "block", color: "var(--text-secondary)", fontSize: "0.75rem", textTransform: "uppercase", marginBottom: "0.25rem" }}>Salary Increase</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                              <span style={{ textDecoration: "line-through", opacity: 0.6 }}>₹{(promo.previousSalary || 0).toLocaleString("en-IN")}</span>
+                              <ArrowRight size={12} style={{ opacity: 0.5 }} />
+                              <span style={{ fontWeight: "600", color: "var(--success)" }}>₹{promo.newSalary.toLocaleString("en-IN")}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {(promo.reason || promo.remarks) && (
+                          <div style={{ marginTop: "1rem", paddingTop: "0.75rem", borderTop: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                            {promo.reason && (
+                              <p style={{ color: "var(--text-secondary)", margin: "0.25rem 0" }}>
+                                <strong>Reason:</strong> {promo.reason}
+                              </p>
+                            )}
+                            {promo.remarks && (
+                              <p style={{ color: "var(--text-secondary)", margin: "0.25rem 0" }}>
+                                <strong>Remarks:</strong> {promo.remarks}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

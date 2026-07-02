@@ -18,6 +18,7 @@ import PayrollPage from "./pages/PayrollPage";
 import BankDetailsPage from "./pages/BankDetailsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
+import PromotionPage from "./pages/PromotionPage";
 import EmployeeFormModal from "./components/Employee/EmployeeFormModal";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -556,6 +557,16 @@ export default function App() {
               element={
                 user && (user.role === "Admin" || permissions.canManageSettings) ? (
                   <SettingsPage user={user} />
+                ) : (
+                  <Navigate to="/dashboard" replace />
+                )
+              }
+            />
+            <Route
+              path="/promotions"
+              element={
+                user && (user.role === "Admin" || permissions.canManageEmployees) ? (
+                  <PromotionPage user={user} />
                 ) : (
                   <Navigate to="/dashboard" replace />
                 )

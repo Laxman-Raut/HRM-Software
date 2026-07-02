@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, ChevronLeft, ChevronRight, User, CalendarCheck, AlertOctagon, CalendarRange, CalendarDays, Megaphone, LogOut, FolderOpen, Coins, Landmark, Settings } from "lucide-react";
+import { LayoutDashboard, Users, ChevronLeft, ChevronRight, User, CalendarCheck, AlertOctagon, CalendarRange, CalendarDays, Megaphone, LogOut, FolderOpen, Coins, Landmark, Settings, TrendingUp } from "lucide-react";
 
 export default function Sidebar({
   collapsed,
@@ -130,6 +130,17 @@ export default function Sidebar({
           <Landmark size={20} />
           <span className="nav-text">Bank Details</span>
         </NavLink>
+
+        {user && (user.role === "Admin" || permissions.canManageEmployees) && (
+          <NavLink
+            to="/promotions"
+            className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+            onClick={() => setMobileOpen && setMobileOpen(false)}
+          >
+            <TrendingUp size={20} />
+            <span className="nav-text">Promotions</span>
+          </NavLink>
+        )}
 
         {user && (user.role === "Admin" || permissions.canManageSettings) && (
           <NavLink
